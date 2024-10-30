@@ -1,0 +1,15 @@
+.avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%; /* Bo tròn để thành hình tròn */
+  overflow: hidden; /* Ẩn phần thừa của ảnh */
+  border: 2px solid #ccc; /* Viền cho avatar */
+  background-color: #f0f0f0; /* Màu nền khi không có ảnh */
+
+}
+
+.avatarImage {
+  width: 100%; /* Để ảnh chiếm toàn bộ chiều rộng */
+  height: auto; /* Tự động điều chỉnh chiều cao */
+}

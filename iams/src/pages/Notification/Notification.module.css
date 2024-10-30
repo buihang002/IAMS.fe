@@ -1,0 +1,57 @@
+.notificationContainer {
+  /* padding: 20px;
+  max-width: 600px;
+  margin: 0 auto; */
+}
+
+.notificationContainer h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.notificationList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.notification p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.notification small {
+  color: #999;
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+/* Styles for different types of notifications */
+.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+
+.info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
