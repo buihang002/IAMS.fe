@@ -1,9 +1,8 @@
-// utils/pageName.js
 export const getPageName = (path) => {
   const parts = path.split("/").filter(Boolean); // Tách đường dẫn và loại bỏ các phần trống
   const pageNames = [];
 
-  console.log("Path parts:", parts); // Kiểm tra các phần của đường dẫn
+  console.log("Path parts:", parts);
 
   parts.forEach((part) => {
     switch (part) {
@@ -23,7 +22,6 @@ export const getPageName = (path) => {
         pageNames.push("Intern Management");
         break;
       default:
-        // Nếu phần là một ID, hiển thị tên trang chi tiết
         if (!isNaN(part)) {
           pageNames.push(`Intern Detail (ID: ${part})`);
         } else {
@@ -34,6 +32,6 @@ export const getPageName = (path) => {
   });
 
   const pageName = pageNames.join(" > ");
-  console.log("Generated Page Name:", pageName); // Kiểm tra tên trang cuối cùng
+  console.log("Generated Page Name:", pageName);
   return pageName;
 };

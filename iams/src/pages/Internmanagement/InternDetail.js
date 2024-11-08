@@ -73,13 +73,13 @@ const InternDetail = ({ isOpen }) => {
                 <div className="mb-4">
                   <p className="font-semibold">Date of Birth:</p>
                   <p className="ml-2 border border-gray-200 p-2 rounded">
-                    intern.dob
+                    {intern.dob}
                   </p>
                 </div>
                 <div className="mb-4">
                   <p className="font-semibold">Phone:</p>
                   <p className="ml-2 border border-gray-200 p-2 rounded">
-                    user.phone
+                    {intern.phone}
                   </p>
                 </div>
               </div>
@@ -89,7 +89,7 @@ const InternDetail = ({ isOpen }) => {
                 <div className="mb-4">
                   <p className="font-semibold">Address:</p>
                   <p className="ml-2 border border-gray-200 p-2 rounded">
-                    intern.address
+                    {intern.address}
                   </p>
                 </div>
                 <div className="mb-4">

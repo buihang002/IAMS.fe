@@ -1,36 +1,59 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+
+const usersData = [
+  {
+    id: "981e",
+    account: "hihihi@gmail.com",
+    password: "123456",
+    role: "mentor",
+  },
+  {
+    id: "29ae",
+    account: "hihihi@gmail.com",
+    password: "123456",
+    role: "mentor",
+  },
+  {
+    id: "5a6b",
+    account: "hihihi@gmail.com",
+    password: "123456",
+    role: "intern",
+  },
+];
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loginError, setLoginError] = useState("");
 
-  const users = [
-    { id: "1", email: "user@gmail.com", password: "123456" },
-    { id: "2", email: "admin@gmail.com", password: "123456" },
-  ];
+  const initialValues = { account: "", password: "", role: "intern" };
 
-  const initialValues = { email: "", password: "" };
   const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Email is not in correct format.")
-      .matches(/.+@.+\..+/, "Email is not in correct format.")
-      .required("Email required"),
+    account: Yup.string().required("Account required"),
     password: Yup.string().required("Password required"),
+    role: Yup.string().required("Role required"),
   });
 
-  const onSubmit = (values) => {
-    const user = users.find(
-      (user) => user.email === values.email && user.password === values.password
+  const handleSubmit = (values) => {
+    const user = usersData.find(
+      (user) =>
+        user.account === values.account &&
+        user.password === values.password &&
+        user.role === values.role
     );
 
     if (user) {
-      setLoginError("");
-      navigate("/dashboard");
+      localStorage.setItem("token", "dummy-token"); // Lưu token giả lập
+      localStorage.setItem("role", user.role); // Lưu vai trò người dùng
+      login(); // Đánh dấu là đã xác thực
+      // Điều hướng đến trang dựa trên vai trò
+      navigate(user.role === "mentor" ? "/dashboard" : "/audit");
     } else {
-      setLoginError("Email or password is incorrect.");
+      setLoginError("Account, password, or role is incorrect.");
     }
   };
 
@@ -45,20 +68,20 @@ const Login = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
         >
           <Form className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Email:
+                Account:
               </label>
               <Field
-                type="email"
-                name="email"
+                type="text"
+                name="account"
                 className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring focus:border-blue-300"
               />
               <ErrorMessage
-                name="email"
+                name="account"
                 component="div"
                 className="text-red-500 text-sm"
               />
@@ -78,6 +101,24 @@ const Login = () => {
                 className="text-red-500 text-sm"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Role:
+              </label>
+              <Field
+                as="select"
+                name="role"
+                className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring focus:border-blue-300"
+              >
+                <option value="intern">Intern</option>
+                <option value="mentor">Mentor</option>
+              </Field>
+              <ErrorMessage
+                name="role"
+                component="div"
+                className="text-red-500 text-sm"
+              />
+            </div>
             <button
               type="submit"
               className="w-full py-2 font-bold text-white bg-gray-800 rounded hover:bg-gray-500"
@@ -86,13 +127,6 @@ const Login = () => {
             </button>
           </Form>
         </Formik>
-
-        <div className="text-center mt-4">
-          <span className="text-gray-600">Don't have an account?</span>
-          <Link to="/register" className="ml-1 text-blue-500 hover:underline">
-            Register
-          </Link>
-        </div>
       </div>
     </div>
   );

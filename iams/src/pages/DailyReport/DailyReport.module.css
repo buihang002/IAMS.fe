@@ -1,0 +1,383 @@
+import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
+
+const DailyReportPage = () => {
+  const [reports, setReports] = useState([]);
+  const [todoInput, setTodoInput] = useState("");
+  const [todos, setTodos] = useState([]);
+  const [questions, setQuestions] = useState("");
+  const [isEditing, setIsEditing] = useState(null);
+
+  useEffect(() => {
+    const storedReports = localStorage.getItem("dailyReports");
+    if (storedReports) {
+      setReports(JSON.parse(storedReports));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("dailyReports", JSON.stringify(reports));
+  }, [reports]);
+
+  const handleAddTodo = () => {
+    if (todoInput.trim() !== "") {
+      setTodos([...todos, { text: todoInput, completed: false }]);
+      setTodoInput("");
+    }
+  };
+
+  const handleToggleTodo = (index, todoList, setTodoList) => {
+    const updatedTodos = todoList.map((todo, i) =>
+      i === index ? { ...todo, completed: !todo.completed } : todo
+    );
+    setTodoList(updatedTodos);
+  };
+
+  const createNewDayReport = () => {
+    if (todos.length === 0 && questions.trim() === "") {
+      alert("Please add to-dos or questions before submitting the report.");
+      return;
+    }
+
+    const newReport = {
+      id: reports.length + 1,
+      dateTime: dayjs().format("YYYY-MM-DD HH:mm"),
+      createdAt: dayjs().unix(),
+      yesterdayTodos: [...todos], // Transfer today's todos to yesterday's work
+      todos: [],
+      questions,
+    };
+
+    setReports([newReport, ...reports]);
+    setTodos([]); // Reset today's todos
+    setQuestions("");
+  };
+
+  const canEditReport = (report) => {
+    const fifteenMinutes = 900; // 15 minutes in seconds
+    const currentTime = dayjs().unix();
+    return currentTime - report.createdAt <= fifteenMinutes;
+  };
+
+  const handleEditReport = (report) => {
+    if (canEditReport(report)) {
+      setIsEditing(report.id);
+    } else {
+      alert(
+        "Editing is only allowed within 15 minutes of creating the report."
+      );
+    }
+  };
+
+  const handleSaveEdit = (
+    reportId,
+    updatedYesterdayTodos,
+    updatedTodos,
+    updatedQuestions
+  ) => {
+    const updatedReports = reports.map((report) =>
+      report.id === reportId
+        ? {
+            ...report,
+            yesterdayTodos: updatedYesterdayTodos,
+            todos: updatedTodos,
+            questions: updatedQuestions,
+          }
+        : report
+    );
+    setReports(updatedReports);
+    setIsEditing(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Daily Report</h1>
+
+        {/* New Report Form */}
+        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-semibold mb-3">Create Daily Report</h2>
+
+          {/* To-Do List Input */}
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">
+              Today's To-Do List
+            </label>
+            <div className="flex mb-2">
+              <input
+                type="text"
+                value={todoInput}
+                onChange={(e) => setTodoInput(e.target.value)}
+                placeholder="Add a new task..."
+                className="flex-grow p-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleAddTodo}
+                className="px-4 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+              >
+                Add
+              </button>
+            </div>
+            <ul>
+              {todos.map((todo, index) => (
+                <li key={index} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => handleToggleTodo(index, todos, setTodos)}
+                    className="mr-2"
+                  />
+                  <span
+                    className={
+                      todo.completed ? "line-through text-gray-500" : ""
+                    }
+                  >
+                    {todo.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Questions Input */}
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Questions</label>
+            <textarea
+              value={questions}
+              onChange={(e) => setQuestions(e.target.value)}
+              placeholder="Enter any questions or notes..."
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            onClick={createNewDayReport}
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+          >
+            Create Daily Report
+          </button>
+        </div>
+
+        {/* Daily Reports List */}
+        <div>
+          <h2 className="text-xl font-semibold mb-3">Reports</h2>
+          {reports.length > 0 ? (
+            reports.map((report) => (
+              <div
+                key={report.id}
+                className="bg-white p-4 rounded-lg shadow-md mb-4"
+              >
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-lg">
+                    Date: {report.dateTime}
+                  </h3>
+                  <button
+                    onClick={() => handleEditReport(report)}
+                    className="text-blue-500 underline"
+                  >
+                    Edit
+                  </button>
+                </div>
+
+                {isEditing === report.id ? (
+                  <>
+                    {/* Yesterday's Work */}
+                    <div className="mt-2">
+                      <h4 className="font-semibold">Yesterday's Work:</h4>
+                      <ul>
+                        {report.yesterdayTodos.map((todo, index) => (
+                          <li key={index} className="flex items-center mb-1">
+                            <input
+                              type="checkbox"
+                              checked={todo.completed}
+                              onChange={() =>
+                                handleToggleTodo(
+                                  index,
+                                  report.yesterdayTodos,
+                                  (updatedTodos) =>
+                                    handleSaveEdit(
+                                      report.id,
+                                      updatedTodos,
+                                      report.todos,
+                                      report.questions
+                                    )
+                                )
+                              }
+                              className="mr-2"
+                            />
+                            <input
+                              type="text"
+                              value={todo.text}
+                              onChange={(e) => {
+                                const updatedTodos = [...report.yesterdayTodos];
+                                updatedTodos[index].text = e.target.value;
+                                handleSaveEdit(
+                                  report.id,
+                                  updatedTodos,
+                                  report.todos,
+                                  report.questions
+                                );
+                              }}
+                              className="border p-1 rounded-md w-full"
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Today's Work */}
+                    <div className="mt-2">
+                      <h4 className="font-semibold">Today's To-Do List:</h4>
+                      <ul>
+                        {report.todos.map((todo, index) => (
+                          <li key={index} className="flex items-center mb-1">
+                            <input
+                              type="checkbox"
+                              checked={todo.completed}
+                              onChange={() =>
+                                handleToggleTodo(
+                                  index,
+                                  report.todos,
+                                  (updatedTodos) =>
+                                    handleSaveEdit(
+                                      report.id,
+                                      report.yesterdayTodos,
+                                      updatedTodos,
+                                      report.questions
+                                    )
+                                )
+                              }
+                              className="mr-2"
+                            />
+                            <input
+                              type="text"
+                              value={todo.text}
+                              onChange={(e) => {
+                                const updatedTodos = [...report.todos];
+                                updatedTodos[index].text = e.target.value;
+                                handleSaveEdit(
+                                  report.id,
+                                  report.yesterdayTodos,
+                                  updatedTodos,
+                                  report.questions
+                                );
+                              }}
+                              className="border p-1 rounded-md w-full"
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mt-2">
+                      <label className="font-semibold">Questions:</label>
+                      <textarea
+                        value={report.questions}
+                        onChange={(e) =>
+                          handleSaveEdit(
+                            report.id,
+                            report.yesterdayTodos,
+                            report.todos,
+                            e.target.value
+                          )
+                        }
+                        className="w-full p-2 border rounded-md"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => setIsEditing(null)}
+                      className="mt-2 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+                    >
+                      Save Changes
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Yesterday's Work */}
+                    <div className="mt-2">
+                      <h4 className="font-semibold">Yesterday's Work:</h4>
+                      <ul>
+                        {report.yesterdayTodos.map((todo, index) => (
+                          <li key={index} className="flex items-center mb-1">
+                            <input
+                              type="checkbox"
+                              checked={todo.completed}
+                              onChange={() =>
+                                handleToggleTodo(
+                                  index,
+                                  report.yesterdayTodos,
+                                  (updatedTodos) =>
+                                    handleSaveEdit(
+                                      report.id,
+                                      updatedTodos,
+                                      report.todos,
+                                      report.questions
+                                    )
+                                )
+                              }
+                              className="mr-2"
+                              disabled
+                            />
+                            <span
+                              className={
+                                todo.completed
+                                  ? "line-through text-gray-500"
+                                  : ""
+                              }
+                            >
+                              {todo.text}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Today's Work */}
+                    <div className="mt-2">
+                      <h4 className="font-semibold">Today's To-Do List:</h4>
+                      <ul>
+                        {report.todos.map((todo, index) => (
+                          <li key={index} className="flex items-center mb-1">
+                            <input
+                              type="checkbox"
+                              checked={todo.completed}
+                              onChange={() =>
+                                handleToggleTodo(index, report.todos, setTodos)
+                              }
+                              className="mr-2"
+                              disabled
+                            />
+                            <span
+                              className={
+                                todo.completed
+                                  ? "line-through text-gray-500"
+                                  : ""
+                              }
+                            >
+                              {todo.text}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Questions */}
+                    <div className="mt-2">
+                      <h4 className="font-semibold">Questions:</h4>
+                      <p>{report.questions}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No reports created yet.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DailyReportPage;

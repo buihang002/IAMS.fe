@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaSearch, FaFilter } from "react-icons/fa";
 
 const InternList = ({ isOpen }) => {
@@ -9,6 +9,7 @@ const InternList = ({ isOpen }) => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filterStatus, setFilterStatus] = useState("");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -48,7 +49,6 @@ const InternList = ({ isOpen }) => {
     setShowFilterDropdown(false); // Close dropdown after selecting
   };
 
-  // Show dropdown and set a 5-second timer to hide it
   const toggleFilterDropdown = () => {
     setShowFilterDropdown(true);
     setTimeout(() => {
@@ -57,8 +57,23 @@ const InternList = ({ isOpen }) => {
   };
 
   return (
-    <div className={`overflow-x-auto transition-all duration-300 mt-20 flex-1`}>
-      <div className="p-2 flex items-center ">
+    <div className="overflow-x-auto transition-all duration-300 mt-20 flex-1">
+      <div className="text-2xl font-bold ml-8">Intern List</div>
+
+      <div className="grid grid-cols-3 gap-4 justify-between items-center border-b border-gray-200 p-8">
+        <div className="rounded p-2 pl-7 border border-gray-300 shadow">
+          Total Interns:
+          <p className="font-bold">{users.length}</p>
+        </div>
+        <div className="rounded p-2 pl-7 border border-gray-300 shadow">
+          Total Active Interns:
+          <p className="font-bold">
+            {users.filter((user) => user.status === "Active").length}
+          </p>
+        </div>
+      </div>
+
+      <div className="p-2 flex items-center mt-3">
         <input
           type="text"
           placeholder="Search by name..."
@@ -68,24 +83,21 @@ const InternList = ({ isOpen }) => {
         />
         <button
           onClick={handleSearch}
-          className="p-3 bg-gray-200 text-gray-500  border border-gray-50 hover:bg-slate-200 rounded ml-2"
+          className="p-3 bg-gray-200 text-gray-500 border border-gray-50 hover:bg-slate-200 rounded ml-2"
         >
           <FaSearch />
         </button>
-        <div className=" ml-2">
-          {/* Filter Icon */}
-          <button className="p-2 flex gap-3 items-center bg-gray-200   border border-gray-50 hover:bg-slate-200 rounded ml-2 ">
+        <div className="ml-2">
+          <button className="p-2 flex gap-3 items-center bg-gray-200 border border-gray-50 hover:bg-slate-200 rounded ml-2">
             <div className="text-gray-500">
               <FaFilter />
             </div>
             <p className="font-semibold">Status</p>
-
             <i
               onClick={toggleFilterDropdown}
               className="bi bi-arrow-down-square-fill hover:text-white"
             ></i>
           </button>
-          {/* Filter Dropdown */}
           {showFilterDropdown && (
             <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg">
               <button
@@ -109,9 +121,14 @@ const InternList = ({ isOpen }) => {
             </div>
           )}
         </div>
+        <button
+          onClick={() => navigate("/create-intern")}
+          className="p-2 ml-4 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+        >
+          Create Intern
+        </button>
       </div>
 
-      {/* Intern List Table */}
       <table className="min-w-full bg-white border border-gray-200 mt-4">
         <thead>
           <tr className="bg-gray-950 text-white uppercase text-sm leading-normal">
@@ -144,17 +161,11 @@ const InternList = ({ isOpen }) => {
               <td className="py-3 px-6 text-left">{user.account}</td>
               <td className="py-3 px-6 text-left">{user.phone}</td>
               <td className="py-3 px-6 text-left">{user.joinDate}</td>
-              <td className="py-3 px-6 text-left flex items-center">
+              <td className="py-3 px-6 text-left">
                 {user.status === "Active" ? (
-                  <span className="flex items-center">
-                    <span className="inline-block w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-                    <span className="text-green-600 font-semibold">Active</span>
-                  </span>
+                  <span className="text-green-600 font-semibold">Active</span>
                 ) : (
-                  <span className="flex items-center">
-                    <span className="inline-block w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-                    <span className="text-red-600 font-semibold">Deactive</span>
-                  </span>
+                  <span className="text-red-600 font-semibold">Deactive</span>
                 )}
               </td>
               <td className="py-3 px-6 text-left">

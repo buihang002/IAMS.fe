@@ -1,6 +1,5 @@
-// src/components/Content.js
 import React from "react";
-import styles from "../Content/content.module.css"; // Import CSS module
+import styles from "../Content/content.module.css";
 
 const Content = () => {
   return (
@@ -24,7 +23,6 @@ const Content = () => {
         tincidunt velit sollicitudin non. Cras vitae urna elit. Duis mollis
         purus a tellus condimentum, a pellentesque dolor faucibus.
       </p>
-      {/* Bạn có thể thêm nhiều nội dung khác */}
     </div>
   );
 };

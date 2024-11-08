@@ -12,35 +12,49 @@ import Notification from "./pages/Notification/Notification";
 import InternList from "./pages/Internmanagement/InternList";
 import InternDetail from "./pages/Internmanagement/InternDetail";
 import Profile from "./pages/Profile/Profile";
-import Register from "./components/Authentication/Register";
+// import Register from "./components/Authentication/Register";
 import Login from "./components/Authentication/Login";
+import CreateInternForm from "./pages/Internmanagement/CreateInternForm";
+// import MainLayout from "./feature/MainLayout/MainLayout";
 import ProtectedRoute from "./components/Authentication/ProtectedRoute";
-import MainLayout from "./feature/MainLayout/MainLayout";
+import { AuthProvider } from "./components/Authentication/AuthContext";
+import CreateAuditForm from "./pages/Audit/CreateAuditForm";
+import AuditDetail from "./pages/Audit/AuditDetails";
+import MainLayout from "./components/MainLayout/MainLayout";
+import { Navigate } from "react-router-dom";
+
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      {/* <Route
-              element={
-                <ProtectedRoute>
-                  {" "}
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            /> */}
+    <>
+      <AuthProvider>
+        <Routes>
+          {/* chính */}
+          <Route path="/login" element={<Login />} />
+          {/* <Route path="/register" element={<Register />} /> */}
 
-      <Route element={<Sidebar />}>
-        <Route path="*" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dailyreport" element={<DailyReport />} />
-        <Route path="/audit" element={<Audit />} />
-        <Route path="/notification" element={<Notification />} />
-        <Route path="/interns" element={<InternList />} />
-        <Route path="/interns/:id" element={<InternDetail />} />
-      </Route>
-    </Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/dailyreport" element={<DailyReport />} />
+            <Route path="/audit" element={<Audit />} />
+            <Route path="/notification" element={<Notification />} />
+            <Route path="/interns" element={<InternList />} />
+            <Route path="/interns/:id" element={<InternDetail />} />
+            <Route path="/create-intern" element={<CreateInternForm />} />
+            <Route path="/create-audit" element={<CreateAuditForm />} />
+            <Route path="/audit/:auditId" element={<AuditDetail />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
+    </>
   );
 }
 

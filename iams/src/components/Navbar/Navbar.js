@@ -26,9 +26,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         {pageName}
       </h1>
 
-      <div className="flex items-center relative">
-        {/* Thêm avatar hoặc các thành phần khác */}
-      </div>
+      <div className="flex items-center relative"></div>
     </nav>
   );
 };

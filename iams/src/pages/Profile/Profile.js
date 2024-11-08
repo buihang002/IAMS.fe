@@ -99,19 +99,46 @@ const Profile = () => {
                   <div className="mb-4">
                     <p className="font-semibold">Name:</p>
                     <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.fullName}
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="fullName"
+                          value={updatedUser.fullName}
+                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
+                        />
+                      ) : (
+                        user.fullName
+                      )}
                     </p>
                   </div>
                   <div className="mb-4">
                     <p className="font-semibold">Account:</p>
                     <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.account}
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="account"
+                          value={updatedUser.account}
+                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
+                        />
+                      ) : (
+                        user.account
+                      )}
                     </p>
                   </div>
                   <div className="mb-4">
                     <p className="font-semibold">Gender:</p>
                     <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.gender}
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="gender"
+                          value={updatedUser.gender}
+                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
+                        />
+                      ) : (
+                        user.gender
+                      )}
                     </p>
                   </div>
                   <div className="mb-4">
@@ -169,13 +196,31 @@ const Profile = () => {
                   <div className="mb-4">
                     <p className="font-semibold">Role:</p>
                     <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.role}
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="role"
+                          value={updatedUser.role}
+                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
+                        />
+                      ) : (
+                        user.role
+                      )}
                     </p>
                   </div>
                   <div className="mb-4">
                     <p className="font-semibold">Social Num:</p>
                     <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.socialNum}
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="role"
+                          value={updatedUser.socialNum}
+                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
+                        />
+                      ) : (
+                        user.socialNum
+                      )}
                     </p>
                   </div>
                   <div className="mb-4">

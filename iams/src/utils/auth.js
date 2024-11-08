@@ -6,7 +6,7 @@ export function login(username, password) {
   );
   if (user) {
     localStorage.setItem("user", JSON.stringify(user));
-    return user.id; // Trả về ID của người dùng khi đăng nhập thành công
+    return user.id;
   }
   return null;
 }
