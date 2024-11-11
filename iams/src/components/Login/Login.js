@@ -30,10 +30,7 @@ const Login = ({ setIsLoggedIn }) => {
       setLoginError("");
 
       try {
-        const response = await axios.post(
-          "http://localhost:9999/users",
-          values
-        );
+        const response = await axios.post("data/interns.json", values);
 
         const user = response.data;
 
