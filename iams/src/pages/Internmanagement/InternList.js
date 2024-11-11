@@ -14,9 +14,9 @@ const InternList = ({ isOpen }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:9999/interns");
-        setUsers(response.data);
-        setFilteredUsers(response.data);
+        const response = await axios.get("data/interns.json");
+        setUsers(response.data.interns);
+        setFilteredUsers(response.data.interns);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
