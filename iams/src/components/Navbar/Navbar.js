@@ -8,7 +8,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <nav
-      className={`p-5 bg-white flex justify-start items-center fixed top-0 transition-all duration-300 
+      className={`p-3 bg-white flex justify-start items-center fixed top-0 transition-all duration-300 
       ${
         isOpen ? "ml-64" : "ml-16"
       } right-0 left-0 z-50 border-b border-gray-300`}
@@ -22,7 +22,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         ></i>
       </button> */}
 
-      <h1 className="m-0 text-gray-800 flex-grow text-start pl-4">
+      <h1 className="m-0 text-gray-800 flex-grow text-start pl-4 text-sm">
         {pageName}
       </h1>
 

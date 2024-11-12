@@ -1,75 +1,73 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Button, Form, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import { Button, Card } from "react-bootstrap";
 
-const AuditDetail = ({ audits }) => {
+const AuditDetail = () => {
+  // Lấy auditId từ URL
   const { auditId } = useParams();
-  const audit = audits.find((a) => a.id === parseInt(auditId));
-  const [selectedParticipant, setSelectedParticipant] = useState(null);
-  const [comment, setComment] = useState("");
-  const [show, setShow] = useState(false);
+  const [audit, setAudit] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleShow = (participant) => {
-    setSelectedParticipant(participant);
-    setShow(true);
-  };
+  useEffect(() => {
+    const fetchAuditDetail = async () => {
+      try {
+        const response = await axios.get("data/db.json");
+        const auditData = response.data.audits.find(
+          (item) => item.id === auditId
+        );
 
-  const handleClose = () => setShow(false);
+        if (auditData) {
+          setAudit(auditData);
+        } else {
+          setError("Audit not found");
+        }
+      } catch (error) {
+        setError("Error fetching audit details.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSaveComment = () => {
-    console.log(`Comment for ${selectedParticipant}: ${comment}`);
-    handleClose();
-  };
+    fetchAuditDetail();
+  }, [auditId]); // Chạy lại useEffect khi auditId thay đổi
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="container mt-5">
-      <h2>Audit Detail</h2>
+    <div className="container mx-auto p-5">
+      <h2 className="text-3xl font-semibold mb-4">Audit Details</h2>
       {audit ? (
-        <>
-          <p>Date: {audit.date}</p>
-          <p>Start Time: {audit.startTime}</p>
-          <p>End Time: {audit.endTime}</p>
-          <h4>Participants</h4>
-          <ul>
-            {audit.participants.map((participant) => (
-              <li key={participant}>
-                {participant}
-                <Button variant="link" onClick={() => handleShow(participant)}>
-                  Comment
-                </Button>
-              </li>
-            ))}
-          </ul>
-
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Comment for {selectedParticipant}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Form.Group controlId="formComment">
-                  <Form.Label>Comment</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                  />
-                </Form.Group>
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
+        <Card className="shadow-lg p-4">
+          <Card.Body>
+            <h4 className="text-2xl font-bold mb-2">Audit Information</h4>
+            <p>
+              <strong>ID:</strong> {audit.id}
+            </p>
+            <p>
+              <strong>Date:</strong> {audit.date}
+            </p>
+            <p>
+              <strong>Start Time:</strong> {audit.startTime}
+            </p>
+            <p>
+              <strong>End Time:</strong> {audit.endTime}
+            </p>
+            <p>
+              <strong>Participants:</strong> {audit.participants.join(", ")}
+            </p>
+            <Link to="/audit">
+              <Button variant="primary" className="mt-4">
+                Back to Audit List
               </Button>
-              <Button variant="primary" onClick={handleSaveComment}>
-                Save Comment
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+            </Link>
+          </Card.Body>
+        </Card>
       ) : (
-        <p>Audit not found</p>
+        <p>No audit data found.</p>
       )}
     </div>
   );

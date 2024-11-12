@@ -9,8 +9,8 @@ const InternDetail = ({ isOpen }) => {
   useEffect(() => {
     const fetchIntern = async () => {
       try {
-        const response = await axios.get(`http://localhost:9999/interns/${id}`); // Đường dẫn lấy thông tin chi tiết
-        setIntern(response.data);
+        const response = await axios.get(`/data/interns/${id}`); // Sử dụng đường dẫn `/data/interns`
+        setIntern(response.data.intern);
       } catch (error) {
         console.error("Lỗi khi lấy thông tin thực tập sinh:", error);
       }
