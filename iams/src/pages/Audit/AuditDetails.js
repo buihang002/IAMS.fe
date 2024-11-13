@@ -126,7 +126,7 @@ const AuditDetail = () => {
                 id="participant-tabs"
                 defaultActiveKey={audit.participants[0]}
               >
-                <Nav variant="tabs" className="mb-3 mt-3">
+                <Nav variant="tabs" className="mb-3 mt-3  ">
                   {audit.participants.map((participant) => (
                     <Nav.Item key={participant}>
                       <Nav.Link eventKey={participant}>{participant}</Nav.Link>
@@ -137,56 +137,68 @@ const AuditDetail = () => {
                   {audit.participants.map((participant) => (
                     <Tab.Pane key={participant} eventKey={participant}>
                       <Form>
+                        <div className="grid grid-cols-3 gap-4">
+                          {" "}
+                          <Form.Group className="mb-3">
+                            <Form.Label className="font-semibold text-zinc-700">
+                              Discipline (1-10)
+                            </Form.Label>
+                            <Form.Control
+                              type="number"
+                              min="1"
+                              max="10"
+                              value={evaluations[participant]?.discipline || ""}
+                              onChange={(e) =>
+                                handleEvaluationChange(
+                                  participant,
+                                  "discipline",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="font-semibold text-zinc-700">
+                              Work (1-10)
+                            </Form.Label>
+                            <Form.Control
+                              type="number"
+                              min="1"
+                              max="10"
+                              value={evaluations[participant]?.work || ""}
+                              onChange={(e) =>
+                                handleEvaluationChange(
+                                  participant,
+                                  "work",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="font-semibold text-zinc-700">
+                              Activity & Attitude (1-10)
+                            </Form.Label>
+                            <Form.Control
+                              type="number"
+                              min="1"
+                              max="10"
+                              value={evaluations[participant]?.attitude || ""}
+                              onChange={(e) =>
+                                handleEvaluationChange(
+                                  participant,
+                                  "attitude",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </Form.Group>
+                        </div>
+
                         <Form.Group className="mb-3">
-                          <Form.Label>Discipline (1-10)</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={evaluations[participant]?.discipline || ""}
-                            onChange={(e) =>
-                              handleEvaluationChange(
-                                participant,
-                                "discipline",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Work (1-10)</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={evaluations[participant]?.work || ""}
-                            onChange={(e) =>
-                              handleEvaluationChange(
-                                participant,
-                                "work",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Activity & Attitude (1-10)</Form.Label>
-                          <Form.Control
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={evaluations[participant]?.attitude || ""}
-                            onChange={(e) =>
-                              handleEvaluationChange(
-                                participant,
-                                "attitude",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Audit Comment</Form.Label>
+                          <Form.Label className="font-semibold text-zinc-700">
+                            Audit Comment
+                          </Form.Label>
                           <Form.Control
                             as="textarea"
                             rows={3}
