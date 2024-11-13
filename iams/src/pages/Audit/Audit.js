@@ -21,8 +21,8 @@ const Audit = () => {
 
   const fetchAudits = async () => {
     try {
-      const response = await axios.get("data/db.json");
-      setAudits(response.data.audits);
+      const response = await axios.get("http://localhost:9999/audits");
+      setAudits(response.data);
     } catch (error) {
       console.error("Error fetching audits:", error);
     }
@@ -43,8 +43,11 @@ const Audit = () => {
     };
 
     try {
-      await axios.post("data/db.json", newAudit); // Adjust as needed for your backend or local setup.
-      setAudits([...audits, newAudit]);
+      const response = await axios.post(
+        "http://localhost:9999/audits",
+        newAudit
+      );
+      setAudits([...audits, response.data]); // Thêm dữ liệu mới vào danh sách
       handleCloseModal();
     } catch (error) {
       console.error("Error creating audit:", error);
@@ -72,8 +75,7 @@ const Audit = () => {
   };
 
   return (
-    <div className="container mx-auto p-5 mt-11">
-      <h2 className="text-2xl font-semibold mb-4">Audit List</h2>
+    <div className="container mx-auto p-5">
       <Button variant="primary" onClick={handleOpenModal}>
         Create Audit
       </Button>

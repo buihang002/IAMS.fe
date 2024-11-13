@@ -39,7 +39,7 @@ const Sidebar = () => {
 
   return (
     <div>
-      <div className="flex">
+      <div className="flex ">
         {/* Sidebar */}
         <div
           className={`bg-slate-950 text-white p-4 ${
@@ -56,18 +56,18 @@ const Sidebar = () => {
               MAIN MENU
             </div>
 
-            <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+            {/* <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
               <Link to="/" className="flex items-center">
                 <i className={`bi bi-list-stars ${isOpen ? "mr-2" : ""}`} />
                 {isOpen && "Dashboard"}
               </Link>
-            </li>
-            <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+            </li> */}
+            {/* <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
               <Link to="/notification" className="flex items-center">
                 <i className={`bi bi-bell ${isOpen ? "mr-2" : ""}`} />
                 {isOpen && "Notifications"}
               </Link>
-            </li>
+            </li> */}
             <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
               <Link to="/dailyreport" className="flex items-center">
                 <i className={`bi bi-calendar3 ${isOpen ? "mr-2" : ""}`} />
