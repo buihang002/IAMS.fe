@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   // FORM DATA
   const [formData, setFormData] = useState({
-    account: "",
+    username: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -84,9 +84,9 @@ export default function Login() {
                   placeholder="Email or login"
                   type="text"
                   onChange={(e) =>
-                    setFormData({ ...formData, account: e.target.value })
+                    setFormData({ ...formData, username: e.target.value })
                   }
-                  value={formData.account}
+                  value={formData.username}
                   required
                 />
               </div>
