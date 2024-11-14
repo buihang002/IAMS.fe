@@ -26,34 +26,40 @@ import { Navigate } from "react-router-dom";
 function App() {
   return (
     <>
-      <AuthProvider>
-        <Routes>
-          {/* chính */}
-          <Route path="/login" element={<Login />} />
-          {/* <Route path="/register" element={<Register />} /> */}
+      {/* <AuthProvider> */}
+      <Routes>
+        {/* chính */}
+        <Route path="/login" element={<Login />} />
+        {/* <Route path="/register" element={<Register />} /> */}
 
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route element={<ProtectedRoute allowedRoles={["mentor"]} />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/dailyreport" element={<DailyReport />} />
-            <Route path="/audit" element={<Audit />} />
-            <Route path="/notification" element={<Notification />} />
-            <Route path="/interns" element={<InternList />} />
-            <Route path="/interns/:id" element={<InternDetail />} />
-            <Route path="/create-intern" element={<CreateInternForm />} />
-            <Route path="/create-audit" element={<CreateAuditForm />} />
-            <Route path="/audit/:id" element={<AuditDetail />} />
           </Route>
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="interns" element={<InternList />} />
+          </Route>
+          {/* <Route path="/" element={<Dashboard />} /> */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dailyreport" element={<DailyReport />} />
+          <Route path="/audit" element={<Audit />} />
+          <Route path="/notification" element={<Notification />} />
+          <Route path="/interns" element={<InternList />} />
+          <Route path="/interns/:id" element={<InternDetail />} />
+          <Route path="/create-intern" element={<CreateInternForm />} />
+          <Route path="/create-audit" element={<CreateAuditForm />} />
+          <Route path="/audit/:id" element={<AuditDetail />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+      {/* </AuthProvider> */}
     </>
   );
 }

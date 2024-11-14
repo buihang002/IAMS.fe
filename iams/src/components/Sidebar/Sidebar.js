@@ -14,7 +14,7 @@ const Sidebar = () => {
   };
 
   const fetchUsername = () => {
-    MyAxios.get("http://localhost:9999/interns")
+    MyAxios.get("users/me")
       .then((response) => {
         const nameData = response.data.data;
         setUsername(nameData.fullName);
@@ -32,7 +32,7 @@ const Sidebar = () => {
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("loggingUser");
-    navigate("/login");
+    // navigate("/login");
   }
 
   const loggingUser = JSON.parse(localStorage.getItem("loggingUser"));
@@ -68,29 +68,35 @@ const Sidebar = () => {
                 {isOpen && "Notifications"}
               </Link>
             </li> */}
-            <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
-              <Link to="/dailyreport" className="flex items-center">
-                <i className={`bi bi-calendar3 ${isOpen ? "mr-2" : ""}`} />
-                {isOpen && "Daily Report"}
-              </Link>
-            </li>
-            <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
-              <Link to="/audit" className="flex items-center">
-                <i className={`bi bi-bookmarks ${isOpen ? "mr-2" : ""}`} />
-                {isOpen && "Audit"}
-              </Link>
-            </li>
-            <li className="my-2 cursor-pointer text-lg p-2  transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
-              <Link to="/interns" className="flex items-center">
-                {isOpen ? (
-                  <>
-                    <i className="bi bi-bookmarks mr-2"></i> Intern Management
-                  </>
-                ) : (
-                  <i className="bi bi-bookmarks"></i>
-                )}
-              </Link>
-            </li>
+            {loggingUser?.role === "intern" && (
+              <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+                <Link to="/dailyreport" className="flex items-center">
+                  <i className={`bi bi-calendar3 ${isOpen ? "mr-2" : ""}`} />
+                  {isOpen && "Daily Report"}
+                </Link>
+              </li>
+            )}
+            {loggingUser?.role === "mentor" && (
+              <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+                <Link to="/audit" className="flex items-center">
+                  <i className={`bi bi-bookmarks ${isOpen ? "mr-2" : ""}`} />
+                  {isOpen && "Audit"}
+                </Link>
+              </li>
+            )}
+            {loggingUser?.role === "mentor" && (
+              <li className="my-2 cursor-pointer text-lg p-2  transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+                <Link to="/interns" className="flex items-center">
+                  {isOpen ? (
+                    <>
+                      <i className="bi bi-bookmarks mr-2"></i> Intern Management
+                    </>
+                  ) : (
+                    <i className="bi bi-bookmarks"></i>
+                  )}
+                </Link>
+              </li>
+            )}
           </ul>
 
           <div className="text-xs font-bold text-gray-500 mt-5">OTHER</div>

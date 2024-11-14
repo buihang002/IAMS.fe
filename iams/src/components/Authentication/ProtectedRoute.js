@@ -1,13 +1,14 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { Navigate, Outlet } from "react-router-dom";
+import MainLayout from "../MainLayout/MainLayout";
+const ProtectedRoute = ({ allowedRoles }) => {
+  const loggedInUser = JSON.parse(localStorage.getItem("loggingUser"));
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (loggedInUser && allowedRoles.includes(loggedInUser.role)) {
+    return <MainLayout />;
+  } else {
+    return <Navigate to="/login" />;
   }
-  return children;
 };
 
 export default ProtectedRoute;
