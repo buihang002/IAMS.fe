@@ -1,136 +1,297 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "../../utils/MyAxios";
 
-const InternDetail = ({ isOpen }) => {
+const InternDetails = () => {
   const { id } = useParams();
   const [intern, setIntern] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
 
+  // Fetch intern details
   useEffect(() => {
-    const fetchIntern = async () => {
+    const fetchInternDetails = async () => {
       try {
-        const response = await axios.get(`/data/interns/${id}`); // Sử dụng đường dẫn `/data/interns`
-        setIntern(response.data.intern);
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin thực tập sinh:", error);
+        const response = await axios.get(`/intern/profile/${id}`);
+        setIntern(response.data);
+        setFormData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch intern details");
+        setLoading(false);
       }
     };
 
-    fetchIntern();
+    fetchInternDetails();
   }, [id]);
 
-  if (!intern) return <div className="text-center py-4">Loading...</div>; // Thông báo khi đang tải
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle gender change
+  const handleGenderChange = (e) => {
+    const value = e.target.value === "true";
+    setFormData((prevData) => ({
+      ...prevData,
+      gender: value,
+    }));
+  };
+
+  // Save changes
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(
+        `/intern/${id}/change-intern-account-status`,
+        formData
+      );
+      setIntern(response.data);
+      setIsEditing(false);
+    } catch (err) {
+      setError("Failed to update intern details");
+    }
+  };
+
+  // Back to list
+  const handleBack = () => {
+    navigate("/intern");
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
-    <div className={` mt-20  mx-auto`}>
-      <Link
-        to="/interns"
-        className="text-gray-800 ml-3 font-semibold border border-gray-200 p-2 rounded bg-gray-300 hover:bg-gray-800 hover:text-white transition duration-300 ease-in-out underline-offset-4 hover:no-underline"
-      >
-        <i className="bi bi-skip-backward-fill"></i> Back
-      </Link>
+    <div className="max-w-4xl mx-auto p-6 bg-white   mt-10">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center">
+        Intern Details
+      </h1>
+      {intern ? (
+        <div>
+          {isEditing ? (
+            // Edit
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Editable Fields */}
+              {["fullName", "phone", "dob", "address", "socialNum"].map(
+                (field) => (
+                  <div key={field}>
+                    <label className="block text-sm font-semibold mb-2 capitalize">
+                      {field}
+                    </label>
+                    <input
+                      type={field === "dob" ? "date" : "text"}
+                      name={field}
+                      value={formData[field] || ""}
+                      onChange={handleChange}
+                      className="w-full border rounded-lg px-4 py-2"
+                    />
+                  </div>
+                )
+              )}
 
-      <div className=" mt-6 pb-8 px-8 w-full  ">
-        <div className=" border border-gray-300 rounded bg-white pl-8 pr-8 shadow">
-          <div className="flex flex-row items-center justify-start">
-            <img
-              src={intern.avatar}
-              alt="User Avatar"
-              className="w-28  h-28 p-3 mb-3 mt-3 rounded-full object-cover "
-            />
+              {/* Gender Field */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleGenderChange}
+                  className="w-full border rounded-lg px-4 py-2"
+                >
+                  <option value={false}>Male</option>
+                  <option value={true}>Female</option>
+                </select>
+              </div>
+
+              {/* Non-editable Fields */}
+              {[
+                "userId",
+                "account",
+                "joinDate",
+                "status",
+                "mentorId",
+                "role",
+              ].map((field) => (
+                <div key={field}>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    {field}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData[field] || ""}
+                    readOnly
+                    className="w-full border bg-gray-100 cursor-not-allowed px-4 py-2"
+                  />
+                </div>
+              ))}
+
+              <div className="col-span-2 flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="bg-gray-500 text-white px-6 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            // View Mode
             <div>
-              <p className="text-lg font-semibold  text-gray-950">
-                {intern.fullName}
-              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Full Name
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.fullName || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Phone
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.phone || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Dob
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.dob || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Address
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.address || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Social Num
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.socialNum || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Gender
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.gender ? "Female" : "Male" || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    User ID
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.userId || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Account
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.account || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Join Date
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.joinDate || ""}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Status
+                  </label>
 
-              <p className="text-sm text-gray-500">{intern.account}</p>
-            </div>
-          </div>
-        </div>
-        <div className=" space-x-4 mt-4">
-          <div className="border border-gray-200 p-2 rounded shadow">
-            <div className="grid grid-cols-2 gap-5 p-5">
-              {/* Cột bên trái */}
-              <div>
-                <div className="mb-4">
-                  <p className="font-semibold">Name:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.fullName}
-                  </p>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.status || ""}
+                  />
                 </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Account:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.account}
-                  </p>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Mentor
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.mentorId || ""}
+                  />
                 </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Gender:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.gender}
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Date of Birth:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.dob}
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Phone:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.phone}
-                  </p>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 capitalize">
+                    Role
+                  </label>
+                  <input
+                    className="w-full border rounded-lg px-4 py-2"
+                    value={intern.role || ""}
+                  />
                 </div>
               </div>
-
-              {/* Cột bên phải */}
-              <div>
-                <div className="mb-4">
-                  <p className="font-semibold">Address:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.address}
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Role:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.role}
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Social Num:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.socialNum}
-                  </p>
-                </div>
-                <div className="mb-4">
-                  <p className="font-semibold">Status:</p>
-                  <p className="ml-2 border border-gray-200 p-2 rounded">
-                    {intern.status === "Active" ? (
-                      <span className="flex items-center">
-                        <span className="inline-block w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-                        <span className="text-green-600 font-semibold">
-                          Active
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <span className="inline-block w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-                        <span className="text-red-600 font-semibold">
-                          Deactive
-                        </span>
-                      </span>
-                    )}
-                  </p>
-                </div>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={handleBack}
+                  className="bg-gray-400 font-bold hover:bg-gray-600 hover:text-white hover:border border-gray-400   text-white px-6 py-2 rounded-lg mt-4"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gray-800 font-bold hover:bg-white hover:text-gray-800 hover:border border-gray-800 text-white px-6 py-2 rounded-lg mt-4"
+                >
+                  Edit
+                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <p>No intern details found.</p>
+      )}
     </div>
   );
 };
 
-export default InternDetail;
+export default InternDetails;

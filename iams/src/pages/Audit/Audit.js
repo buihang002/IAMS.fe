@@ -1,362 +1,50 @@
-// import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
-// import axios from "axios";
-// import { Modal, Button, Form } from "react-bootstrap";
-// import { v4 as uuidv4 } from "uuid";
-
-// const Audit = () => {
-//   const [audits, setAudits] = useState([]);
-//   const [showModal, setShowModal] = useState(false);
-//   const [date, setDate] = useState("");
-//   const [startTime, setStartTime] = useState("");
-//   const [endTime, setEndTime] = useState("");
-//   const [participants, setParticipants] = useState([]);
-//   const [error, setError] = useState("");
-
-//   const defaultParticipants = ["Minh", "Joyce", "Lyly"];
-
-//   useEffect(() => {
-//     fetchAudits();
-//   }, []);
-
-//   const fetchAudits = async () => {
-//     try {
-//       const response = await axios.get("http://localhost:9999/audits");
-//       setAudits(response.data);
-//     } catch (error) {
-//       console.error("Error fetching audits:", error);
-//     }
-//   };
-
-//   const handleSaveAudit = async () => {
-//     if (!date || !startTime || !endTime || participants.length === 0) {
-//       setError("Please fill in all fields.");
-//       return;
-//     }
-
-//     const newAudit = {
-//       id: uuidv4(),
-//       date,
-//       startTime,
-//       endTime,
-//       participants,
-//     };
-
-//     try {
-//       const response = await axios.post(
-//         "http://localhost:9999/audits",
-//         newAudit
-//       );
-//       setAudits([...audits, response.data]); // Thêm dữ liệu mới vào danh sách
-//       handleCloseModal();
-//     } catch (error) {
-//       console.error("Error creating audit:", error);
-//       setError("There was an error saving the audit. Please try again.");
-//     }
-//   };
-
-//   const handleOpenModal = () => {
-//     setShowModal(true);
-//     setError("");
-//   };
-
-//   const handleCloseModal = () => {
-//     setShowModal(false);
-//     setDate("");
-//     setStartTime("");
-//     setEndTime("");
-//     setParticipants([]);
-//   };
-
-//   const toggleParticipant = (name) => {
-//     setParticipants((prev) =>
-//       prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name]
-//     );
-//   };
-
-//   return (
-//     <div className="container mx-auto p-5">
-//       <Button variant="primary" onClick={handleOpenModal}>
-//         Create Audit
-//       </Button>
-
-//       <div className="mt-4">
-//         <table className="table-auto w-full">
-//           <thead>
-//             <tr className="bg-gray-950 text-white uppercase text-sm leading-normal">
-//               <th className="px-4 py-2">ID</th>
-//               <th className="px-4 py-2">Date</th>
-//               <th className="px-4 py-2">Start Time</th>
-//               <th className="px-4 py-2">End Time</th>
-//               <th className="px-4 py-2">Participants</th>
-//               <th className="px-4 py-2">View Details</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {audits.map((audit) => (
-//               <tr key={audit.id}>
-//                 <td className="border px-4 py-2">{audit.id}</td>
-//                 <td className="border px-4 py-2">{audit.date}</td>
-//                 <td className="border px-4 py-2">{audit.startTime}</td>
-//                 <td className="border px-4 py-2">{audit.endTime}</td>
-//                 <td className="border px-4 py-2">
-//                   {audit.participants.join(", ")}
-//                 </td>
-//                 <td className="border px-4 py-2">
-//                   <Link
-//                     to={`/audit/${audit.id}`}
-//                     className="text-blue-500 hover:underline"
-//                   >
-//                     View Detail
-//                   </Link>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* Create Audit Modal */}
-//       <Modal show={showModal} onHide={handleCloseModal}>
-//         <Modal.Header closeButton>
-//           <Modal.Title>Create New Audit</Modal.Title>
-//         </Modal.Header>
-//         <Modal.Body>
-//           {error && <div className="text-red-500 mb-4">{error}</div>}
-//           <Form>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Date</Form.Label>
-//               <Form.Control
-//                 type="date"
-//                 value={date}
-//                 onChange={(e) => setDate(e.target.value)}
-//               />
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Start Time</Form.Label>
-//               <Form.Control
-//                 type="time"
-//                 value={startTime}
-//                 onChange={(e) => setStartTime(e.target.value)}
-//               />
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>End Time</Form.Label>
-//               <Form.Control
-//                 type="time"
-//                 value={endTime}
-//                 onChange={(e) => setEndTime(e.target.value)}
-//               />
-//             </Form.Group>
-//             <Form.Group className="mb-3">
-//               <Form.Label>Participants</Form.Label>
-//               {defaultParticipants.map((name) => (
-//                 <Form.Check
-//                   key={name}
-//                   type="checkbox"
-//                   label={name}
-//                   checked={participants.includes(name)}
-//                   onChange={() => toggleParticipant(name)}
-//                 />
-//               ))}
-//             </Form.Group>
-//           </Form>
-//         </Modal.Body>
-//         <Modal.Footer>
-//           <Button variant="secondary" onClick={handleCloseModal}>
-//             Cancel
-//           </Button>
-//           <Button variant="primary" onClick={handleSaveAudit}>
-//             Save Audit
-//           </Button>
-//         </Modal.Footer>
-//       </Modal>
-//     </div>
-//   );
-// };
-
-// export default Audit;
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
-import { Modal, Button, Form } from "react-bootstrap";
-import { v4 as uuidv4 } from "uuid";
-
-const Audit = () => {
+import { Link } from "react-router-dom";
+const AuditList = () => {
   const [audits, setAudits] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [participants, setParticipants] = useState([]);
-  const [error, setError] = useState("");
-
-  const defaultParticipants = ["Minh", "Joyce", "Lyly"];
 
   useEffect(() => {
-    fetchAudits();
+    axios
+      .get("http://localhost:8080/audit/get-by-month?month=10&year=2024")
+      .then((response) => {
+        setAudits(response.data);
+      })
+      .catch((error) => console.error("Error fetching audits:", error));
   }, []);
 
-  const fetchAudits = async () => {
-    try {
-      const response = await axios.get("/audits");
-      setAudits(response.data);
-    } catch (error) {
-      console.error("Error fetching audits:", error);
-    }
-  };
-
-  const handleSaveAudit = async () => {
-    if (!date || !startTime || !endTime || participants.length === 0) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
-    const newAudit = {
-      id: uuidv4(),
-      date,
-      startTime,
-      endTime,
-      participants,
-    };
-
-    try {
-      const response = await axios.post("/audits", newAudit);
-      setAudits([...audits, response.data]);
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error creating audit:", error);
-      setError("There was an error saving the audit. Please try again.");
-    }
-  };
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-    setError("");
-
-    // Get the current date and time
-    const currentDate = new Date();
-    const currentDateString = currentDate.toISOString().slice(0, 10);
-    const currentTimeString = currentDate.toTimeString().slice(0, 5); // "HH:mm" format
-
-    setDate(currentDateString);
-    setStartTime(currentTimeString);
-    setEndTime(currentTimeString);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setDate("");
-    setStartTime("");
-    setEndTime("");
-    setParticipants([]);
-  };
-
-  const toggleParticipant = (name) => {
-    setParticipants((prev) =>
-      prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name]
-    );
-  };
-
   return (
-    <div className="container mx-auto p-5">
-      <Button variant="primary" onClick={handleOpenModal}>
-        Create Audit
-      </Button>
-
-      <div className="mt-4">
-        <table className="table-auto w-full">
-          <thead>
-            <tr className="bg-gray-950 text-white uppercase text-sm leading-normal">
-              <th className="px-4 py-2">ID</th>
-              <th className="px-4 py-2">Date</th>
-              <th className="px-4 py-2">Start Time</th>
-              <th className="px-4 py-2">End Time</th>
-              <th className="px-4 py-2">Participants</th>
-              <th className="px-4 py-2">View Details</th>
+    <div className="container mx-auto p-6 mt-11">
+      <h1 className="text-2xl font-bold mb-4">Audit Management</h1>
+      <Link to="/create-audit">Create New Audit</Link>
+      <table className="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-300 p-2">ID</th>
+            <th className="border border-gray-300 p-2">Date</th>
+            <th className="border border-gray-300 p-2">Evaluation Period</th>
+            <th className="border border-gray-300 p-2">Interns</th>
+          </tr>
+        </thead>
+        <tbody>
+          {audits.map((audit) => (
+            <tr key={audit.id} className="hover:bg-gray-100">
+              <td className="border border-gray-300 p-2">{audit.id}</td>
+              <td className="border border-gray-300 p-2">
+                {new Date(audit.date).toLocaleDateString()}
+              </td>
+              <td className="border border-gray-300 p-2">
+                {audit.evaluationPeriod}
+              </td>
+              <td className="border border-gray-300 p-2">
+                {audit.interns.map((intern) => intern.name).join(", ")}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {audits.map((audit) => (
-              <tr key={audit.id}>
-                <td className="border px-4 py-2">{audit.id}</td>
-                <td className="border px-4 py-2">{audit.date}</td>
-                <td className="border px-4 py-2">{audit.startTime}</td>
-                <td className="border px-4 py-2">{audit.endTime}</td>
-                <td className="border px-4 py-2">
-                  {audit.participants.join(", ")}
-                </td>
-                <td className="border px-4 py-2">
-                  <Link
-                    to={`/audit/${audit.id}`}
-                    className="text-blue-500 hover:underline"
-                  >
-                    View Detail
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Create Audit Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Create New Audit</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error && <div className="text-red-500 mb-4">{error}</div>}
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Start Time</Form.Label>
-              <Form.Control
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>End Time</Form.Label>
-              <Form.Control
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Participants</Form.Label>
-              {defaultParticipants.map((name) => (
-                <Form.Check
-                  key={name}
-                  type="checkbox"
-                  label={name}
-                  checked={participants.includes(name)}
-                  onChange={() => toggleParticipant(name)}
-                />
-              ))}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSaveAudit}>
-            Save Audit
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default Audit;
+export default AuditList;

@@ -1,99 +1,69 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid"; // Install this package for unique IDs: npm install uuid
 
-const CreateAudit = () => {
+const CreateAuditForm = () => {
   const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [participants, setParticipants] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [evaluationPeriod, setEvaluationPeriod] = useState("WEEKLY");
+  const [interns, setInterns] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const data = { date, evaluationPeriod, interns: interns.split(",") };
 
-    // Basic Validation
-    if (!date || !startTime || !endTime || !participants) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
-    const newAudit = {
-      id: uuidv4(), // Generates a unique ID
-      date,
-      startTime,
-      endTime,
-      participants: participants.split(",").map((p) => p.trim()), // Split and trim participant names
-    };
-
-    try {
-      await axios.post("http://localhost:3001/audits", newAudit);
-      navigate("/audits"); // Redirect to audit list page
-    } catch (error) {
-      console.error("Error creating audit:", error);
-      setError("There was an error saving the audit. Please try again.");
-    }
+    axios
+      .post("http://localhost:8080/audit/create-new-form", data)
+      .then(() => {
+        alert("Audit created successfully!");
+      })
+      .catch((error) => console.error("Error creating audit:", error));
   };
 
   return (
-    <div className="container mx-auto p-8 mt-12 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">
-        Create New Audit
-      </h2>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">Date</label>
+    <div className="container mx-auto p-6 mt-20">
+      <h1 className="text-2xl font-bold mb-4">Create New Audit</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block font-medium">Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 border-gray-300 rounded-md w-full"
+            className="border border-gray-300 p-2 w-full rounded"
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">
-            Start Time
-          </label>
-          <input
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            className="mt-1 border-gray-300 rounded-md w-full"
-          />
+        <div>
+          <label className="block font-medium">Evaluation Period</label>
+          <select
+            value={evaluationPeriod}
+            onChange={(e) => setEvaluationPeriod(e.target.value)}
+            className="border border-gray-300 p-2 w-full rounded"
+          >
+            <option value="WEEKLY">Weekly</option>
+            <option value="FORTNIGHT">Fortnight</option>
+            <option value="MONTHLY">Monthly</option>
+          </select>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">End Time</label>
-          <input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            className="mt-1 border-gray-300 rounded-md w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">
-            Participants
+        <div>
+          <label className="block font-medium">
+            Interns (Comma-separated IDs)
           </label>
           <input
             type="text"
-            value={participants}
-            onChange={(e) => setParticipants(e.target.value)}
-            className="mt-1 border-gray-300 rounded-md w-full"
-            placeholder="Separate names with commas"
+            placeholder="Enter intern IDs"
+            value={interns}
+            onChange={(e) => setInterns(e.target.value)}
+            className="border border-gray-300 p-2 w-full rounded"
           />
         </div>
         <button
           type="submit"
-          className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-200"
+          className="bg-blue-500 text-white py-2 px-4 rounded"
         >
-          Save Audit
+          Submit
         </button>
       </form>
     </div>
   );
 };
 
-export default CreateAudit;
+export default CreateAuditForm;

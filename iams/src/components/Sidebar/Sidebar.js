@@ -35,7 +35,7 @@ const Sidebar = () => {
     // navigate("/login");
   }
 
-  const loggingUser = JSON.parse(localStorage.getItem("loggingUser"));
+  // const loggingUser = JSON.parse(localStorage.getItem("loggingUser"));
 
   return (
     <div>
@@ -46,11 +46,14 @@ const Sidebar = () => {
             isOpen ? "w-64" : "w-16"
           } h-screen fixed top-0 left-0 overflow-y-auto z-50 transition-width duration-300`}
         >
-          <div className="text-2xl font-bold mb-5 text-center pb-4">IAMS</div>
-          <div className="role">
-            <span className="role-box">{loggingUser?.role}</span>
+          <div className="text-center text-2xl mb-4 font-bold bg-gradient-to-r from-blue-500  to-white bg-clip-text text-transparent hover:from-blue-400 hover:via-green-500 hover:to-yellow-500 active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out ">
+            IAMS
           </div>
-          <ul className="list-none p-0 m-0">
+
+          <div className="role">
+            {/* <span className="role-box">{loggingUser?.role}</span> */}
+          </div>
+          <ul className="list-none p-0 m-0  ">
             <li className="my-2 cursor-pointer text-lg p-2 rounded transition duration-300 ease-in-out text-gray-500 bg-slate-200 hover:bg-gray-300 hover:text-white border hover:border-white border-gray-400"></li>
             <div className="text-xs font-bold text-gray-500 pt-7">
               MAIN MENU
@@ -68,44 +71,47 @@ const Sidebar = () => {
                 {isOpen && "Notifications"}
               </Link>
             </li> */}
-            {loggingUser?.role === "intern" && (
-              <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
-                <Link to="/dailyreport" className="flex items-center">
+            {/* {loggingUser?.role === "intern" && ( */}
+            <div className="ml-2 mt-4">
+              <li className="text-lg p-2 font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
+                <Link to="/dailyreport" className="flex items-center ">
                   <i className={`bi bi-calendar3 ${isOpen ? "mr-2" : ""}`} />
                   {isOpen && "Daily Report"}
                 </Link>
               </li>
-            )}
-            {loggingUser?.role === "mentor" && (
-              <li className="my-2 cursor-pointer text-lg p-2 transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
+              {/* )} */}
+              {/* {loggingUser?.role === "mentor" && ( */}
+              <li className="mt-3 text-lg p-2 font-bold font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
                 <Link to="/audit" className="flex items-center">
                   <i className={`bi bi-bookmarks ${isOpen ? "mr-2" : ""}`} />
                   {isOpen && "Audit"}
                 </Link>
               </li>
-            )}
-            {loggingUser?.role === "mentor" && (
-              <li className="my-2 cursor-pointer text-lg p-2  transition duration-300 ease-in-out text-gray-300 hover:bg-gray-800 hover:text-white">
-                <Link to="/interns" className="flex items-center">
+              {/* )} */}
+              {/* {loggingUser?.role === "mentor" && ( */}
+              <li className=" mt-3 text-lg p-2 font-bold font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
+                <Link to="/intern" className="flex items-center">
                   {isOpen ? (
                     <>
-                      <i className="bi bi-bookmarks mr-2"></i> Intern Management
+                      <i className="bi bi-people-fill mr-2"></i> Intern
+                      Management
                     </>
                   ) : (
-                    <i className="bi bi-bookmarks"></i>
+                    <i className="bi bi-people-fill"></i>
                   )}
                 </Link>
               </li>
-            )}
+              {/* )} */}
+            </div>
           </ul>
 
           <div className="text-xs font-bold text-gray-500 mt-5">OTHER</div>
-          <button
+          {/* <button
             onClick={handleLogout}
             className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 mt-2"
           >
             Logout
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -18,16 +18,15 @@ export const getPageName = (path) => {
       case "notification":
         pageNames.push("Notification");
         break;
-      case "interns":
+      case "intern":
         pageNames.push("Intern Management");
         break;
-      default:
-        if (!isNaN(part)) {
-          pageNames.push(`Intern Detail (ID: ${part})`);
-        } else {
-          pageNames.push("Page Not Found");
-        }
+      case "profile":
+        pageNames.push("Profile");
         break;
+
+      default:
+        pageNames.push(part);
     }
   });
 

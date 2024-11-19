@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "../../utils/MyAxios";
 const Profile = () => {
+  const { id } = useParams();
+  const [intern, setIntern] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     fullName: "John Doe",
     avatar:
@@ -14,30 +22,81 @@ const Profile = () => {
     role: "Mentor",
     status: "Active",
   });
+  // Fetch intern details
+  useEffect(() => {
+    const fetchInternDetails = async () => {
+      try {
+        const response = await axios.get(`/intern/profile/${id}`);
+        setIntern(response.data);
+        setFormData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch intern details");
+        setLoading(false);
+      }
+    };
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedUser, setUpdatedUser] = useState({ ...user });
-
-  const handleInputChange = (e) => {
+    fetchInternDetails();
+  }, [id]);
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedUser({ ...updatedUser, [name]: value });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
+  const handleGenderChange = (e) => {
+    const value = e.target.value === "true";
+    setFormData((prevData) => ({
+      ...prevData,
+      gender: value,
+    }));
   };
-
-  const handleSave = () => {
-    setUser(updatedUser);
-    setIsEditing(false);
-  };
-
-  const handleAvatarChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = URL.createObjectURL(e.target.files[0]);
-      setUser((prevUser) => ({ ...prevUser, avatar: file }));
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(`/intern/edit-profile/${id}`, formData);
+      setIntern(response.data);
+      setIsEditing(false);
+    } catch (err) {
+      setError("Failed to update intern details");
     }
   };
+  const handleBack = () => {
+    navigate("/intern");
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // const [isEditing, setIsEditing] = useState(false);
+  // const [updatedUser, setUpdatedUser] = useState({ ...user });
+
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setUpdatedUser({ ...updatedUser, [name]: value });
+  // };
+
+  // const handleEdit = () => {
+  //   setIsEditing(true);
+  // };
+
+  // const handleSave = () => {
+  //   setUser(updatedUser);
+  //   setIsEditing(false);
+  // };
+
+  // const handleAvatarChange = (e) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const file = URL.createObjectURL(e.target.files[0]);
+  //     setUser((prevUser) => ({ ...prevUser, avatar: file }));
+  //   }
+  // };
 
   // const handleAvatarDelete = () => {
   //   setUser((prevUser) => ({
@@ -63,13 +122,13 @@ const Profile = () => {
               />
               <div>
                 <p className="text-lg font-semibold text-gray-800">
-                  <input
+                  {/* <input
                     type="text"
                     name="fullName"
                     value={updatedUser.fullName}
                     onChange={handleInputChange}
                     className=" focus:outline-none "
-                  />
+                  /> */}
                 </p>
 
                 <p className="text-sm text-gray-500">{user.account}</p>
@@ -77,12 +136,12 @@ const Profile = () => {
             </div>
 
             <div className="r items-center mb-4">
-              <input
+              {/* <input
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
                 className="mb-2 "
-              />
+              /> */}
             </div>
           </div>
           <div className=" space-x-4 mt-4">
@@ -93,184 +152,218 @@ const Profile = () => {
                   <i className="bi bi-person-fill"></i>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-5 p-5">
-                {/* Cột bên trái */}
+              {intern ? (
                 <div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Name:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="fullName"
-                          value={updatedUser.fullName}
-                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
-                        />
-                      ) : (
-                        user.fullName
+                  {isEditing ? (
+                    // Edit
+                    <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Editable Fields */}
+                      {["fullName", "phone", "dob", "address", "socialNum"].map(
+                        (field) => (
+                          <div key={field}>
+                            <label className="block text-sm font-semibold mb-2 capitalize">
+                              {field}
+                            </label>
+                            <input
+                              type={field === "dob" ? "date" : "text"}
+                              name={field}
+                              value={formData[field] || ""}
+                              onChange={handleChange}
+                              className="w-full border rounded-lg px-4 py-2"
+                            />
+                          </div>
+                        )
                       )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Account:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="account"
-                          value={updatedUser.account}
-                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
-                        />
-                      ) : (
-                        user.account
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Gender:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
+
+                      {/* Gender Field */}
+                      <div>
+                        <label className="block text-sm font-semibold mb-2">
+                          Gender
+                        </label>
+                        <select
                           name="gender"
-                          value={updatedUser.gender}
-                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
-                        />
-                      ) : (
-                        user.gender
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Date of Birth:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="date"
-                          name="dob"
-                          value={updatedUser.dob}
-                          onChange={handleInputChange}
-                          className="border-b-2 border-gray-200 focus:outline-none"
-                        />
-                      ) : (
-                        user.dob
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Phone:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="phone"
-                          value={updatedUser.phone}
-                          onChange={handleInputChange}
-                          className="border-b-2 border-gray-200 focus:outline-none"
-                        />
-                      ) : (
-                        user.phone
-                      )}
-                    </p>
-                  </div>
-                </div>
+                          value={formData.gender}
+                          onChange={handleGenderChange}
+                          className="w-full border rounded-lg px-4 py-2"
+                        >
+                          <option value={false}>Male</option>
+                          <option value={true}>Female</option>
+                        </select>
+                      </div>
 
-                {/* Cột bên phải */}
-                <div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Address:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="address"
-                          value={updatedUser.address}
-                          onChange={handleInputChange}
-                          className="border-b-2 border-gray-200 focus:outline-none"
-                        />
-                      ) : (
-                        user.address
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Role:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="role"
-                          value={updatedUser.role}
-                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
-                        />
-                      ) : (
-                        user.role
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Social Num:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="role"
-                          value={updatedUser.socialNum}
-                          className="bg-gray-100 rounded p-1 w-full focus:outline-none"
-                        />
-                      ) : (
-                        user.socialNum
-                      )}
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p className="font-semibold">Status:</p>
-                    <p className="ml-2 border border-gray-200 p-2 rounded">
-                      {user.status === "Active" ? (
-                        <span className="flex items-center">
-                          <span className="inline-block w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-                          <span className="text-green-600 font-semibold">
-                            Active
-                          </span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center">
-                          <span className="inline-block w-3 h-3 mr-2 bg-red-500 rounded-full"></span>
-                          <span className="text-red-600 font-semibold">
-                            Deactive
-                          </span>
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                      {/* Non-editable Fields */}
+                      {[
+                        "userId",
+                        "account",
+                        "joinDate",
+                        "status",
+                        "mentorId",
+                        "role",
+                      ].map((field) => (
+                        <div key={field}>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            {field}
+                          </label>
+                          <input
+                            type="text"
+                            value={formData[field] || ""}
+                            readOnly
+                            className="w-full border bg-gray-100 cursor-not-allowed px-4 py-2"
+                          />
+                        </div>
+                      ))}
 
-              <div className="flex  space-x-4 justify-end mr-5 mb-6 ">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={handleSave}
-                      className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="bg-gray-500 text-white px-4 py-2 rounded"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={handleEdit}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded "
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
+                      <div className="col-span-2 flex justify-end space-x-4">
+                        <button
+                          type="button"
+                          onClick={handleSave}
+                          className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditing(false)}
+                          className="bg-gray-500 text-white px-6 py-2 rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    // View Mode
+                    <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Full Name
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.fullName || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Phone
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.phone || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Dob
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.dob || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Address
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.address || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Social Num
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.socialNum || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Gender
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.gender ? "Female" : "Male" || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            User ID
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.userId || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Account
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.account || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Join Date
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.joinDate || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Status
+                          </label>
+
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.status || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Mentor
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.mentorId || ""}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold mb-2 capitalize">
+                            Role
+                          </label>
+                          <input
+                            className="w-full border rounded-lg px-4 py-2"
+                            value={intern.role || ""}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-4">
+                        <button
+                          onClick={handleBack}
+                          className="bg-gray-400 font-bold hover:bg-gray-600 hover:text-white hover:border border-gray-400   text-white px-6 py-2 rounded-lg mt-4"
+                        >
+                          Back
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="bg-gray-800 font-bold hover:bg-white hover:text-gray-800 hover:border border-gray-800 text-white px-6 py-2 rounded-lg mt-4"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p>No information found.</p>
+              )}
             </div>
           </div>
         </div>

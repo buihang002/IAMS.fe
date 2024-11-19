@@ -1,135 +1,106 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/MyAxios";
 
 const CreateInternForm = () => {
-  const [fullName, setFullName] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [account, setAccount] = useState("");
-  const [phone, setPhone] = useState("");
-  const [gender, setGender] = useState("");
-  const [dob, setDob] = useState("");
-  const [address, setAddress] = useState("");
-  const [joinDate, setJoinDate] = useState(
-    new Date().toISOString().split("T")[0]
-  ); // Ngày hiện tại
-  const [socialNum] = useState("123456789"); // Mã số xã hội mặc định
-  const [role] = useState("intern"); // Giá trị mặc định cho role
-  const [status, setStatus] = useState("Active");
   const navigate = useNavigate();
+  const [newIntern, setNewIntern] = useState({
+    account: "",
+    fullName: "",
+    socialNum: "",
+    mentorAccount: "",
+  });
+  const [error, setError] = useState(null);
 
-  // Hàm tạo mật khẩu ngẫu nhiên
-  const generateRandomPassword = () => {
-    return Math.random().toString(36).slice(-8); // Tạo mật khẩu ngẫu nhiên có 8 ký tự
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewIntern((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitCreate = async (e) => {
     e.preventDefault();
-    const password = generateRandomPassword(); // Tạo mật khẩu ngẫu nhiên
-    const newIntern = {
-      fullName,
-      avatar,
-      account,
-      phone,
-      gender,
-      dob,
-      address,
-      joinDate,
-      socialNum,
-      role,
-      status,
-      password,
-    };
-
     try {
-      await axios.post("http://localhost:9999/interns", newIntern);
-      navigate("/interns");
-    } catch (error) {
-      console.error("Error creating intern:", error);
+      await axiosInstance.post("/authentication/intern/register", newIntern);
+      navigate("/intern");
+    } catch (err) {
+      setError("Failed to create intern. Please try again.");
     }
   };
 
   return (
-    <div className="p-8 mt-11">
-      <h2 className="text-2xl font-bold mb-7">Create New Intern</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Full Name"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Avatar URL"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={avatar}
-          onChange={(e) => setAvatar(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Account"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={account}
-          onChange={(e) => setAccount(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Phone"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-        />
-        <select
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-          className="p-2 border border-gray-300 rounded w-full"
-          required
-        >
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-        <input
-          type="date"
-          placeholder="Date of Birth"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={dob}
-          onChange={(e) => setDob(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          required
-        />
-        <input
-          type="date"
-          placeholder="Join Date"
-          className="p-2 border border-gray-300 rounded w-full"
-          value={joinDate}
-          readOnly // Để người dùng không chỉnh sửa
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="p-2 border border-gray-300 rounded w-full"
-        >
-          <option value="Active">Active</option>
-          <option value="Deactive">Deactive</option>
-        </select>
-        <button type="submit" className="p-2 bg-blue-500 text-white rounded">
-          Submit
-        </button>
+    <div className=" mt-11 p-6 bg-white m-7">
+      <h1 className="text-2xl font-bold mb-6 p-2 bg-gray-200 rounded-md text-gray-900 text-center">
+        NEW INTERN REGISTRATION FORM
+      </h1>
+      {error && <p className="text-red-500">{error}</p>}
+      <form
+        onSubmit={handleSubmitCreate}
+        className="max-w-md mx-auto grid grid-cols-1 gap-4"
+      >
+        <div className="mb-4 font-bold text-gray-700 ">
+          <label className="block text-gray-700 ">Account</label>
+          <input
+            type="email"
+            name="account"
+            value={newIntern.account}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded hover:border-gray-600 hover:border-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block font-bold text-gray-700">Full Name</label>
+          <input
+            type="text"
+            name="fullName"
+            value={newIntern.fullName}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded hover:border-gray-600 hover:border-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block font-bold text-gray-700">Social Number</label>
+          <input
+            type="text"
+            name="socialNum"
+            value={newIntern.socialNum}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded hover:border-gray-600 hover:border-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block font-bold text-gray-700">
+            Mentor Account
+          </label>
+          <input
+            type="email"
+            name="mentorAccount"
+            value={newIntern.mentorAccount}
+            onChange={handleInputChange}
+            required
+            className="w-full px-3 py-2 border rounded hover:border-gray-600 hover:border-2"
+          />
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => navigate("/intern")}
+            className="bg-gray-300 font-bold hover:bg-gray-600 text-white px-4 py-2 rounded mr-2"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            className="bg-gray-700 font-bold hover:bg-white hover:text-gray-700 hover:border hover:border-gray-700 text-white px-4 py-2 rounded"
+          >
+            Create
+          </button>
+        </div>
       </form>
     </div>
   );

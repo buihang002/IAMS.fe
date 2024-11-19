@@ -2,7 +2,8 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL: "http://localhost:8080",
-  timeout: 5000,
+  withCredentials: true, // tự động gửi cookie chứa JWT trong mọi yêu cầu mà không cần xử lý token thủ công.
+  // timeout: 5000,
   headers: {
     "Content-Type": "application/json",
   },

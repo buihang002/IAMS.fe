@@ -1,185 +1,225 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaFilter } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import axiosInstance from "../../utils/MyAxios";
+const InternList = () => {
+  const [interns, setInterns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const InternList = ({ isOpen }) => {
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("");
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const navigate = useNavigate();
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // Fetch ACTIVE interns - dự bị
+  const fetchActiveInterns = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get("/intern/get-active");
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to fetch active interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search interns by name - dự bị
+  const handleSearch = async () => {
+    if (!searchKeyword.trim()) {
+      fetchInterns();
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get(`/intern/search-name`, {
+        params: { name: searchKeyword },
+      });
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to search interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchInterns = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get("/intern/get-all");
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to fetch interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this intern?")) {
+      try {
+        const response = await axiosInstance.delete(`/intern/delete/${id}`);
+        if (response.status === 200) {
+          fetchInterns();
+        } else {
+          setError("Failed to delete intern. Please try again.");
+        }
+      } catch (err) {
+        setError("Failed to delete intern. Please try again.");
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("data/interns.json");
-        setUsers(response.data.interns);
-        setFilteredUsers(response.data.interns);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-    fetchUsers();
+    fetchInterns();
   }, []);
-
-  const handleSearch = () => {
-    let results = users.filter((user) =>
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    if (filterStatus) {
-      results = results.filter((user) => user.status === filterStatus);
-    }
-    setFilteredUsers(results);
-  };
-
-  const handleFilter = (status) => {
-    setFilterStatus(status);
-    let results = users;
-    if (status) {
-      results = users.filter((user) => user.status === status);
-    }
-    if (searchTerm) {
-      results = results.filter((user) =>
-        user.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    setFilteredUsers(results);
-    setShowFilterDropdown(false); // Close dropdown after selecting
-  };
-
-  const toggleFilterDropdown = () => {
-    setShowFilterDropdown(true);
-    setTimeout(() => {
-      setShowFilterDropdown(false);
-    }, 5000);
-  };
-
+  console.log(interns);
   return (
-    <div className="overflow-x-auto transition-all duration-300 mt-20 flex-1">
-      <div className="text-2xl font-bold ml-8">Intern List</div>
+    <div className="max-w-7xl mx-auto mt-11 px-4">
+      <h1 className="text-3xl font-bold "> Intern Management</h1>
+      <p className="text-gray-500 text-sm">
+        Manage intern roster and progress details
+      </p>
+      <div className="  border-gray-200 grid grid-cols-2 gap-5">
+        <div className="text-gray-500 mb-4 mt-4 justify-start">
+          <strong>All Interns:</strong> {interns.length}
+        </div>
+        {/* <div className="m-4 border shadow-sm border-gray-200 h-60 w-100 overflow-y-scroll rounded-md scrollbar scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-gray-200">
+          <div className=" pl-10 p-4  border-b font-bold ">
+            Total Interns: {interns.length} interns
+          </div>
+          <ul class=" ">
+            {interns.map((intern, index) => (
+              <tr key={intern.userId}>
+                <td className="px-11 py-2 text-center">{index + 1}</td>
 
-      <div className="grid grid-cols-3 gap-4 justify-between items-center border-b border-gray-200 p-8">
-        <div className="rounded p-2 pl-7 border border-gray-300 shadow">
-          Total Interns:
-          <p className="font-bold">{users.length}</p>
-        </div>
-        <div className="rounded p-2 pl-7 border border-gray-300 shadow">
-          Total Active Interns:
-          <p className="font-bold">
-            {users.filter((user) => user.status === "Active").length}
-          </p>
-        </div>
+                <td className="px-4 py-2">{intern.fullName}</td>
+                <td className="px-4 py-2">{intern.account}</td>
+              </tr>
+            ))}
+          </ul>
+        </div> */}
+        {/* <div>
+          <div className="m-4 border shadow-lg border-gray-200 h-30 w-100 "></div>
+          <div className="m-4 border shadow-lg border-gray-200 h-20 w-100 ">
+            Total Active Interns:
+            {interns.filter((intern) => intern.status === "ACTIVE").length}
+          </div>
+        </div> */}
       </div>
-
-      <div className="p-2 flex items-center mt-3">
+      <div className=" flex justify-end items-center mb-6 mt-7">
         <input
           type="text"
-          placeholder="Search by name..."
-          className="p-2 w-1/3 ml-auto outline-none border border-gray-300 rounded"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by name"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          className="border border-gray-300 px-2 py-2 rounded-lg w-1/3"
         />
         <button
           onClick={handleSearch}
-          className="p-3 bg-gray-200 text-gray-500 border border-gray-50 hover:bg-slate-200 rounded ml-2"
+          className="bg-blue-600 border border-blue-500 ml-2 font-bold text-white hover:text-black px-2 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl"
         >
-          <FaSearch />
+          <i className="bi bi-search-heart mr-2" />
+          Search
         </button>
-        <div className="ml-2">
-          <button className="p-2 flex gap-3 items-center bg-gray-200 border border-gray-50 hover:bg-slate-200 rounded ml-2">
-            <div className="text-gray-500">
-              <FaFilter />
-            </div>
-            <p className="font-semibold">Status</p>
-            <i
-              onClick={toggleFilterDropdown}
-              className="bi bi-arrow-down-square-fill hover:text-white"
-            ></i>
-          </button>
-          {showFilterDropdown && (
-            <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg">
-              <button
-                onClick={() => handleFilter("Active")}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-              >
-                Active
-              </button>
-              <button
-                onClick={() => handleFilter("Deactive")}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-              >
-                Deactive
-              </button>
-              <button
-                onClick={() => handleFilter("")}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-              >
-                All
-              </button>
-            </div>
-          )}
-        </div>
         <button
-          onClick={() => navigate("/create-intern")}
-          className="p-2 ml-4 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+          onClick={fetchActiveInterns}
+          className="bg-green-600 border ml-4 mr-4 border-green-500 font-bold text-white hover:text-green-600  px-2 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl"
         >
-          Create Intern
+          {" "}
+          <i class=" bi bi-record-fill mr-2"></i>
+          Active Interns
         </button>
+        <button
+          onClick={fetchInterns}
+          className=" bg-gray-800 border border-gray-600 font-bold text-white hover:text-black px-4 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl mr-4"
+        >
+          <i className="bi bi-justify mr-2"></i>
+          All Interns
+        </button>
+
+        <Link
+          to="/intern/create-intern"
+          className=" bg-gray-800 border border-gray-600 font-bold  text-white hover:text-black px-2 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl"
+        >
+          <i className="bi bi-file-earmark-plus-fill mr-1" /> Create Intern
+        </Link>
       </div>
 
-      <table className="min-w-full bg-white border border-gray-200 mt-4">
-        <thead>
-          <tr className="bg-gray-950 text-white uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">ID</th>
-            <th className="py-3 px-6 text-left">Name</th>
-            <th className="py-3 px-6 text-left">Role</th>
-            <th className="py-3 px-6 text-left">Account</th>
-            <th className="py-3 px-6 text-left">Phone</th>
-            <th className="py-3 px-6 text-left">Join Date</th>
-            <th className="py-3 px-6 text-left">Status</th>
-            <th className="py-3 px-6 text-left">View Detail</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-600 text-sm font-light">
-          {filteredUsers.map((user) => (
-            <tr
-              key={user.id}
-              className="border-b border-gray-200 hover:bg-gray-100"
-            >
-              <td className="py-3 px-6 text-left">{user.id}</td>
-              <td className="flex items-center py-3 px-6 text-left">
-                <img
-                  src={user.avatar}
-                  alt={`${user.fullName}'s avatar`}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div className="ml-4">{user.fullName}</div>
-              </td>
-              <td className="py-3 px-6 text-left">{user.role}</td>
-              <td className="py-3 px-6 text-left">{user.account}</td>
-              <td className="py-3 px-6 text-left">{user.phone}</td>
-              <td className="py-3 px-6 text-left">{user.joinDate}</td>
-              <td className="py-3 px-6 text-left">
-                {user.status === "Active" ? (
-                  <span className="text-green-600 font-semibold">Active</span>
-                ) : (
-                  <span className="text-red-600 font-semibold">Deactive</span>
-                )}
-              </td>
-              <td className="py-3 px-6 text-left">
-                <Link
-                  to={`/interns/${user.id}`}
-                  className="text-indigo-600 hover:underline"
-                >
-                  View Detail
-                </Link>
-              </td>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && !error && interns.length === 0 && (
+        <p>No interns found. Add one using the button above.</p>
+      )}
+      {!loading && !error && interns.length > 0 && (
+        <table className="table-auto w-full bg-white border border-gray-200 shadow rounded-xl">
+          <thead>
+            <tr className="text-xl font-bold bg-gray-800 text-white border">
+              <th className="px-4 py-2">#</th>
+              <th className="px-4 py-2">Account</th>
+              <th className="px-4 py-2">Full Name</th>
+              <th className="px-4 py-2">Social Number</th>
+              <th className="px-4 py-2">Mentor</th>
+              <th className="px-4 py-2">Join Date</th>
+              <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {interns.map((intern, index) => (
+              <tr
+                key={intern.userId}
+                className="border-t hover:bg-gradient-to-r hover:from-blue-300 hover:to-white hover:scale-105 transition-transform transform duration-300"
+              >
+                <td className="px-4 py-2 text-center">{index + 1}</td>
+                <td className="px-4 py-2">{intern.account}</td>
+                <td className="px-4 py-2">{intern.fullName}</td>
+                <td className="px-4 py-2">{intern.socialNum}</td>
+                <td className="px-4 py-2 text-center">{intern.mentorId}</td>
+                <td className="px-4 py-2 text-center">
+                  {intern.joinDate
+                    ? new Date(intern.joinDate).toLocaleDateString("en-GB")
+                    : "N/A"}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <span
+                    className={`inline-block w-3.5 h-3.5 rounded-full mr-2 ${(() => {
+                      switch (intern.status) {
+                        case "ACTIVE":
+                          return "bg-green-500";
+                        case "INACTIVE":
+                          return "bg-red-500";
+                        case "WARNING":
+                          return "bg-yellow-500";
+                        case "DISQUALIFIED":
+                          return "bg-orange-500";
+                        default:
+                          return "bg-gray-500";
+                      }
+                    })()}`}
+                  ></span>
+
+                  {intern.status}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <Link
+                    to={`/intern/profile/${intern.userId}`}
+                    className="bg-transparent hover:bg-blue-500 hover:text-white hover:shadow-lg hover:shadow-blue-300 text-blue-500 px-3 py-1 rounded-full transition-all duration-300 transform hover:scale-110 mr-2"
+                  >
+                    <i className="bi bi-eye-fill" />
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(intern.userId)}
+                    className="bg-transparent hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-300 text-red-500 px-3 py-1 rounded-full transition-all duration-300 transform hover:scale-110"
+                  >
+                    <i className="bi bi-trash-fill"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
