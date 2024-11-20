@@ -23,15 +23,6 @@ const CreateAuditForm = () => {
       <h1 className="text-2xl font-bold mb-4">Create New Audit</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium">Date</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 p-2 w-full rounded"
-          />
-        </div>
-        <div>
           <label className="block font-medium">Evaluation Period</label>
           <select
             value={evaluationPeriod}

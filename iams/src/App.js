@@ -22,7 +22,8 @@ import CreateAuditForm from "./pages/Audit/CreateAuditForm";
 import AuditDetail from "./pages/Audit/AuditDetails";
 import MainLayout from "./components/MainLayout/MainLayout";
 import { Navigate } from "react-router-dom";
-
+import AuditListID from "./pages/Audit/Mentor/AuditID";
+import AuditResult from "./pages/Audit/Mentor/AuditResult";
 function App() {
   return (
     <>
@@ -56,6 +57,8 @@ function App() {
           <Route path="/intern/create-intern" element={<CreateInternForm />} />
           <Route path="/create-audit" element={<CreateAuditForm />} />
           <Route path="/audit/:id" element={<AuditDetail />} />
+          <Route path="/auditlistid" element={<AuditListID />} />
+          <Route path="/auditresult" element={<AuditResult />} />
         </Route>
         {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
       </Routes>

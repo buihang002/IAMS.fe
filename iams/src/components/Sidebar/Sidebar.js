@@ -81,7 +81,7 @@ const Sidebar = () => {
               </li>
               {/* )} */}
               {/* {loggingUser?.role === "mentor" && ( */}
-              <li className="mt-3 text-lg p-2 font-bold font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
+              <li className="mt-3 text-lg p-2 font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
                 <Link to="/audit" className="flex items-center">
                   <i className={`bi bi-bookmarks ${isOpen ? "mr-2" : ""}`} />
                   {isOpen && "Audit"}
@@ -89,7 +89,7 @@ const Sidebar = () => {
               </li>
               {/* )} */}
               {/* {loggingUser?.role === "mentor" && ( */}
-              <li className=" mt-3 text-lg p-2 font-bold font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
+              <li className=" mt-3 text-lg p-2 font-bold bg-gradient-to-br from-white  to-white bg-clip-text text-transparent hover:from-blue-500  hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out  hover:scale-110 active:scale-90 focus:scale-120">
                 <Link to="/intern" className="flex items-center">
                   {isOpen ? (
                     <>

@@ -9,11 +9,13 @@ const InternList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
 
   // Fetch ACTIVE interns - dự bị
-  const fetchActiveInterns = async () => {
+  const fetchActiveInterns = async (mentorId) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get("/intern/get-active");
+      const response = await axiosInstance.get(
+        `/intern/${mentorId}/status/get-active`
+      );
       setInterns(response.data);
     } catch (err) {
       setError("Failed to fetch active interns. Please try again.");
@@ -32,7 +34,7 @@ const InternList = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/intern/search-name`, {
+      const response = await axiosInstance.get(`/intern/search-keyword`, {
         params: { name: searchKeyword },
       });
       setInterns(response.data);
@@ -42,11 +44,14 @@ const InternList = () => {
       setLoading(false);
     }
   };
-  const fetchInterns = async () => {
+  const fetchInterns = async (mentorId) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get("/intern/get-all");
+      const response = await axiosInstance.get(
+        `/intern/get-by-mentor/${mentorId}`
+        // `/intern/get-all`
+      );
       setInterns(response.data);
     } catch (err) {
       setError("Failed to fetch interns. Please try again.");
