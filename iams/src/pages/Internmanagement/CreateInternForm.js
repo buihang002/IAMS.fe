@@ -31,7 +31,7 @@ const CreateInternForm = () => {
   };
 
   return (
-    <div className=" mt-11 p-6 bg-white m-7">
+    <div className="  p-6 bg-white ">
       <h1 className="text-2xl font-bold mb-6 p-2 bg-gray-200 rounded-md text-gray-900 text-center">
         NEW INTERN REGISTRATION FORM
       </h1>

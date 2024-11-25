@@ -1,122 +1,133 @@
-// import React, { useEffect, useState } from "react";
-// import MyAxios from "../../utils/MyAxios";
-// import { useNavigate } from "react-router-dom";
-// import { useFormik } from "formik";
-// import * as Yup from "yup";
+import React, { useEffect, useState } from "react";
+import MyAxios from "../../utils/MyAxios";
+import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { jwtDecode } from "jwt-decode"; // Import đúng cách
 
-// export default function Login() {
-//   const [error, setError] = useState("");
-//   const navigate = useNavigate();
+export default function Login() {
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       navigate("/login");
-//     }
-//   }, [navigate]);
+  // Kiểm tra token trong localStorage, nếu có thì chuyển hướng khỏi trang login
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/"); // Điều hướng đến trang dashboard hoặc trang chính khác
+    }
+  }, [navigate]);
 
-//   const saveUserToLocalStorage = async () => {
-//     try {
-//       // Uncomment and configure as needed to fetch user info and save it
-//       const res = await MyAxios.get("/authentication/get/my-profile");
-//       const userData = res.data.data;
-//       localStorage.setItem("loggingUser", JSON.stringify(userData));
-//       const userRole = userData.role;
-//       if (userRole === "intern") {
-//         navigate("/dashboard");
-//       } else {
-//         navigate("/audit");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching user info:", error);
-//       setError("error fetching user info.");
-//     }
-//   };
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      password: "",
+    },
+    validationSchema: Yup.object({
+      username: Yup.string().required("Please enter your username."),
+      password: Yup.string().required("Please enter your password."),
+    }),
+    onSubmit: async (values) => {
+      setError(""); // Xóa lỗi trước khi gửi
 
-//   const formik = useFormik({
-//     initialValues: {
-//       username: "",
-//       password: "",
-//     },
-//     validationSchema: Yup.object({
-//       username: Yup.string().required("Please enter your username."),
-//       password: Yup.string().required("Please enter your password."),
-//     }),
-//     onSubmit: async (values) => {
-//       setError(""); // Clear previous error
+      try {
+        const res = await MyAxios.post("/authentication/login", values);
 
-//       try {
-//         const res = await MyAxios.post("/authentication/login", values);
-//         if (res.status === 200) {
-//           // Save token to localStorage
-//           localStorage.setItem("token", res.data.data);
-//           await saveUserToLocalStorage();
-//         }
-//       } catch (error) {
-//         console.error("Login error:", error);
-//         setError(
-//           "Đăng nhập không thành công. Vui lòng kiểm tra thông tin tài khoản."
-//         );
-//       }
-//     },
-//   });
+        if (res.data && res.data.token) {
+          const token = res.data.token;
 
-//   return (
-//     <div className="d-flex flex-column align-items-center mt-24">
-//       <div className="card text-center" style={{ width: "400px" }}>
-//         <article className="card-body">
-//           <h4 className="card-title text-center mb-4 mt-1">Sign in</h4>
-//           <hr />
+          const decoded = jwtDecode(token);
 
-//           {error && <div className="alert alert-danger">{error}</div>}
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(decoded));
 
-//           <form onSubmit={formik.handleSubmit}>
-//             <div className="form-group mb-3 mt-2">
-//               <div className="input-group">
-//                 <div className="input-group-prepend">
-//                   <span className="input-group-text">
-//                     <i className="bi bi-person"></i>
-//                   </span>
-//                 </div>
-//                 <input
-//                   className="form-control"
-//                   placeholder="Email or login"
-//                   type="text"
-//                   {...formik.getFieldProps("username")}
-//                 />
-//               </div>
-//               {formik.touched.username && formik.errors.username ? (
-//                 <div className="text-danger">{formik.errors.username}</div>
-//               ) : null}
-//             </div>
+          // Role
+          if (decoded.role === "MENTOR") {
+            navigate("/dashboardmentor");
+          } else if (decoded.role === "INTERN") {
+            navigate("/dashboardintern");
+          }
+        } else {
+          setError("Đăng nhập không thành công. Vui lòng thử lại.");
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        setError(
+          error.response?.data?.message ||
+            "Đăng nhập không thành công. Vui lòng kiểm tra thông tin tài khoản."
+        );
+      }
+    },
+  });
 
-//             <div className="form-group mb-3">
-//               <div className="input-group">
-//                 <div className="input-group-prepend">
-//                   <span className="input-group-text">
-//                     <i className="bi bi-shield-lock"></i>
-//                   </span>
-//                 </div>
-//                 <input
-//                   className="form-control"
-//                   placeholder="******"
-//                   type="password"
-//                   {...formik.getFieldProps("password")}
-//                 />
-//               </div>
-//               {formik.touched.password && formik.errors.password ? (
-//                 <div className="text-danger">{formik.errors.password}</div>
-//               ) : null}
-//             </div>
+  return (
+    <div className="flex flex-col items-center ">
+      <div className=" shadow-md rounded-lg w-96 mr-96 mt-20 p-6">
+        <h4 className="text-center text-2xl font-semibold mb-4 font-mono text-gray-800">
+          Sign in
+        </h4>
+        <hr className="mb-4" />
 
-//             <div className="form-group">
-//               <button type="submit" className="btn btn-primary btn-block w-75">
-//                 Login
-//               </button>
-//             </div>
-//           </form>
-//         </article>
-//       </div>
-//     </div>
-//   );
-// }
+        {error && (
+          <div className="bg-red-100 text-red-600 p-2 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={formik.handleSubmit}>
+          {/* Username Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-1" htmlFor="username">
+              Username
+            </label>
+            <div className="flex items-center border rounded p-2">
+              <i className="bi bi-person text-gray-500 mr-2"></i>
+              <input
+                id="username"
+                className="flex-1 outline-none"
+                placeholder="Email or login"
+                type="text"
+                {...formik.getFieldProps("username")}
+              />
+            </div>
+            {formik.touched.username && formik.errors.username ? (
+              <div className="text-red-600 text-sm mt-1">
+                {formik.errors.username}
+              </div>
+            ) : null}
+          </div>
+
+          {/* Password Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-1" htmlFor="password">
+              Password
+            </label>
+            <div className="flex items-center border rounded p-2">
+              <i className="bi bi-shield-lock text-gray-500 mr-2"></i>
+              <input
+                id="password"
+                className="flex-1 outline-none"
+                placeholder="******"
+                type="password"
+                {...formik.getFieldProps("password")}
+              />
+            </div>
+            {formik.touched.password && formik.errors.password ? (
+              <div className="text-red-600 text-sm mt-1">
+                {formik.errors.password}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-3/4"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

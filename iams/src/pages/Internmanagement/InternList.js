@@ -1,20 +1,105 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../../utils/MyAxios";
+
 const InternList = () => {
   const [interns, setInterns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
 
   // Fetch ACTIVE interns - dự bị
-  const fetchActiveInterns = async (mentorId) => {
+  const fetchActiveInterns = async () => {
+    const userStr = localStorage.getItem("user");
+    const user = JSON.parse(userStr);
+    const mentorId = user?.userId;
+
+    if (!mentorId) {
+      setError("No user ID found");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const response = await axiosInstance.get(
         `/intern/${mentorId}/status/get-active`
+      );
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to fetch active interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  // ----------------------//
+  const fetchInActiveInterns = async () => {
+    const userStr = localStorage.getItem("user");
+    const user = JSON.parse(userStr);
+    const mentorId = user?.userId;
+
+    if (!mentorId) {
+      setError("No user ID found");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get(
+        `/intern/${mentorId}/status/get-inactive`
+      );
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to fetch active interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchWarningInterns = async () => {
+    const userStr = localStorage.getItem("user");
+    const user = JSON.parse(userStr);
+    const mentorId = user?.userId;
+
+    if (!mentorId) {
+      setError("No user ID found");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get(
+        `/intern/${mentorId}/status/get-warning`
+      );
+      setInterns(response.data);
+    } catch (err) {
+      setError("Failed to fetch active interns. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDisqualifyInterns = async () => {
+    const userStr = localStorage.getItem("user");
+    const user = JSON.parse(userStr);
+    const mentorId = user?.userId;
+
+    if (!mentorId) {
+      setError("No user ID found");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.get(
+        `/intern/${mentorId}/status/get-disqualify`
       );
       setInterns(response.data);
     } catch (err) {
@@ -44,17 +129,34 @@ const InternList = () => {
       setLoading(false);
     }
   };
-  const fetchInterns = async (mentorId) => {
+  const fetchInterns = async () => {
     setLoading(true);
     setError(null);
     try {
+      const userStr = localStorage.getItem("user");
+      const user = JSON.parse(userStr);
+      const userId = user?.userId;
+
+      if (!userId) {
+        setError("No user ID found");
+        return;
+      }
+
       const response = await axiosInstance.get(
-        `/intern/get-by-mentor/${mentorId}`
-        // `/intern/get-all`
+        `/intern/get-by-mentor/${userId}`
       );
-      setInterns(response.data);
+
+      if (response && response.data) {
+        setInterns(response.data);
+      } else {
+        setError("No interns found for this mentor.");
+      }
     } catch (err) {
-      setError("Failed to fetch interns. Please try again.");
+      console.error("Fetch error:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to fetch interns. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -79,8 +181,9 @@ const InternList = () => {
     fetchInterns();
   }, []);
   console.log(interns);
+
   return (
-    <div className="max-w-7xl mx-auto mt-11 px-4">
+    <div className="max-w-7xl mx-auto px-4">
       <h1 className="text-3xl font-bold "> Intern Management</h1>
       <p className="text-gray-500 text-sm">
         Manage intern roster and progress details
@@ -127,22 +230,71 @@ const InternList = () => {
           <i className="bi bi-search-heart mr-2" />
           Search
         </button>
+        {/* ----------------------- */}
+        <div className="relative inline-block text-left ml-2">
+          {/* Dropdown button */}
+          <button
+            onClick={toggleDropdown}
+            className=" transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl mr-4 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Manage Interns
+            <i className="ml-2 bi bi-chevron-down"></i>
+          </button>
+
+          {/* Dropdown menu */}
+          {isOpen && (
+            <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                <button
+                  onClick={fetchActiveInterns}
+                  className="text-gray-700 block px-4 py-2 text-sm hover:bg-green-100 hover:text-green-600 w-full text-left"
+                >
+                  <i className="bi bi-record-fill mr-2 text-green-600"></i>
+                  Active Interns
+                </button>
+                <button
+                  onClick={fetchInActiveInterns}
+                  className="text-gray-700 block px-4 py-2 text-sm hover:bg-red-100 hover:text-red-600 w-full text-left"
+                >
+                  <i className="bi bi-record-fill mr-2 text-red-600"></i>
+                  Inactive Interns
+                </button>
+                <button
+                  onClick={fetchWarningInterns}
+                  className="text-gray-700 block px-4 py-2 text-sm hover:bg-orange-100 hover:text-orange-600 w-full text-left"
+                >
+                  <i className="bi bi-record-fill mr-2 text-orange-600"></i>
+                  Warning Interns
+                </button>
+                <button
+                  onClick={fetchDisqualifyInterns}
+                  className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-600 w-full text-left"
+                >
+                  <i className="bi bi-record-fill mr-2 text-gray-600"></i>
+                  Disqualify Interns
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* ---------------------- */}
         <button
-          onClick={fetchActiveInterns}
-          className="bg-green-600 border ml-4 mr-4 border-green-500 font-bold text-white hover:text-green-600  px-2 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl"
-        >
-          {" "}
-          <i class=" bi bi-record-fill mr-2"></i>
-          Active Interns
-        </button>
-        <button
-          onClick={fetchInterns}
-          className=" bg-gray-800 border border-gray-600 font-bold text-white hover:text-black px-4 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl mr-4"
+          onClick={() => {
+            fetchInterns();
+          }}
+          className=" bg-gray-800 border ml-2 border-gray-600 font-bold text-white hover:text-black px-4 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl mr-2"
         >
           <i className="bi bi-justify mr-2"></i>
           All Interns
         </button>
 
+        {/* <button
+          onClick={fetchInterns}
+          className=" bg-gray-800 border border-gray-600 font-bold text-white hover:text-black px-4 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl mr-4"
+        >
+          <i className="bi bi-justify mr-2"></i>
+          All Interns
+        </button> */}
         <Link
           to="/intern/create-intern"
           className=" bg-gray-800 border border-gray-600 font-bold  text-white hover:text-black px-2 py-2 transition-transform transform hover:scale-110 hover:bg-gradient-to-r hover:from-white hover:to-white duration-300 rounded-xl"
@@ -197,7 +349,7 @@ const InternList = () => {
                         case "WARNING":
                           return "bg-yellow-500";
                         case "DISQUALIFIED":
-                          return "bg-orange-500";
+                          return "bg-gray-500";
                         default:
                           return "bg-gray-500";
                       }

@@ -48,7 +48,7 @@ const InternDetails = () => {
   }
 
   return (
-    <div className="mt-14 ">
+    <div className=" ">
       <div className="ml-5 ">
         <Link to="/intern" className="text-blue-500 hover:underline text-sm">
           Back to List

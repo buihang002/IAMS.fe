@@ -29,9 +29,9 @@ const CreateAuditForm = () => {
             onChange={(e) => setEvaluationPeriod(e.target.value)}
             className="border border-gray-300 p-2 w-full rounded"
           >
-            <option value="WEEKLY">Weekly</option>
-            <option value="FORTNIGHT">Fortnight</option>
-            <option value="MONTHLY">Monthly</option>
+            <option value="0">Weekly</option>
+            <option value="1">Fortnight</option>
+            <option value="3">Monthly</option>
           </select>
         </div>
         <div>
@@ -58,3 +58,67 @@ const CreateAuditForm = () => {
 };
 
 export default CreateAuditForm;
+// import React, { useState } from "react";
+// import { Modal, Button, Form } from "react-bootstrap";
+
+// const AuditForm = ({ onSubmit, onClose }) => {
+//   const [mentorId, setMentorId] = useState("");
+//   const [evaluationPeriod, setEvaluationPeriod] = useState(0);
+//   const [interns, setInterns] = useState("");
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     const formData = {
+//       mentorId,
+//       evaluationPeriod: parseInt(evaluationPeriod),
+//       interns: interns.split(",").map((id) => id.trim()),
+//     };
+//     onSubmit(formData);
+//   };
+
+//   return (
+//     <Modal show onHide={onClose}>
+//       <Modal.Header closeButton>
+//         <Modal.Title>Create New Audit</Modal.Title>
+//       </Modal.Header>
+//       <Modal.Body>
+//         <Form onSubmit={handleSubmit}>
+//           <Form.Group controlId="mentorId" className="mb-3">
+//             <Form.Label>Mentor ID</Form.Label>
+//             <Form.Control
+//               type="text"
+//               value={mentorId}
+//               onChange={(e) => setMentorId(e.target.value)}
+//               required
+//             />
+//           </Form.Group>
+//           <Form.Group controlId="evaluationPeriod" className="mb-3">
+//             <Form.Label>Evaluation Period</Form.Label>
+//             <Form.Select
+//               value={evaluationPeriod}
+//               onChange={(e) => setEvaluationPeriod(e.target.value)}
+//             >
+//               <option value="0">WEEKLY</option>
+//               <option value="1">FORTNIGHT</option>
+//               <option value="2">MONTHLY</option>
+//             </Form.Select>
+//           </Form.Group>
+//           <Form.Group controlId="interns" className="mb-3">
+//             <Form.Label>Intern IDs (comma separated)</Form.Label>
+//             <Form.Control
+//               type="text"
+//               value={interns}
+//               onChange={(e) => setInterns(e.target.value)}
+//               required
+//             />
+//           </Form.Group>
+//           <Button variant="primary" type="submit">
+//             Submit
+//           </Button>
+//         </Form>
+//       </Modal.Body>
+//     </Modal>
+//   );
+// };
+
+// export default AuditForm;
