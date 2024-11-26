@@ -1,124 +1,271 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../utils/MyAxios";
 
-const CreateAuditForm = () => {
-  const [date, setDate] = useState("");
-  const [evaluationPeriod, setEvaluationPeriod] = useState("WEEKLY");
-  const [interns, setInterns] = useState("");
+const CreateFormAudit = () => {
+  const [formData, setFormData] = useState({
+    mentorId: "",
+    evaluationPeriod: 0,
+    interns: [],
+  });
 
-  const handleSubmit = (e) => {
+  const [interns, setInterns] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const fetchInterns = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const userStr = localStorage.getItem("user");
+        const user = JSON.parse(userStr);
+        const userId = user?.userId;
+
+        if (!userId) {
+          setError("No user ID found in localStorage.");
+          return;
+        }
+
+        const response = await axiosInstance.get(
+          `/intern/get-by-mentor/${userId}`
+        );
+
+        if (response && response.data) {
+          setInterns(response.data);
+        } else {
+          setError("No interns found for this mentor.");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(
+          err.response?.data?.message ||
+            "Failed to fetch interns. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInterns();
+  }, []);
+
+  const handleAddIntern = (userId) => {
+    if (!formData.interns.includes(userId)) {
+      setFormData({
+        ...formData,
+        interns: [...formData.interns, userId],
+      });
+    }
+  };
+
+  const handleRemoveIntern = (userId) => {
+    setFormData({
+      ...formData,
+      interns: formData.interns.filter((id) => id !== userId),
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = { date, evaluationPeriod, interns: interns.split(",") };
+    setLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
 
-    axios
-      .post("http://localhost:8080/audit/create-new-form", data)
-      .then(() => {
-        alert("Audit created successfully!");
-      })
-      .catch((error) => console.error("Error creating audit:", error));
+    try {
+      const response = await axiosInstance.post(
+        "/audit/create-new-form",
+        formData
+      );
+      if (response.status === 200) {
+        setSuccessMessage("Audit form created successfully!");
+        setFormData({
+          mentorId: "",
+          evaluationPeriod: 0,
+          interns: [],
+        });
+      }
+    } catch (err) {
+      setErrorMessage(
+        err.response?.data?.message ||
+          "Failed to create audit form. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="container mx-auto p-6 mt-20">
-      <h1 className="text-2xl font-bold mb-4">Create New Audit</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-5xl mx-auto p-6 bg-white">
+      <h1 className="text-4xl font-bold text-center text-gray-800 mb-6">
+        Create Audit Form
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <label className="block font-medium">Evaluation Period</label>
-          <select
-            value={evaluationPeriod}
-            onChange={(e) => setEvaluationPeriod(e.target.value)}
-            className="border border-gray-300 p-2 w-full rounded"
+          <label
+            htmlFor="mentorId"
+            className="block text-lg font-medium text-gray-800"
           >
-            <option value="0">Weekly</option>
-            <option value="1">Fortnight</option>
-            <option value="3">Monthly</option>
-          </select>
-        </div>
-        <div>
-          <label className="block font-medium">
-            Interns (Comma-separated IDs)
+            Mentor
           </label>
           <input
             type="text"
-            placeholder="Enter intern IDs"
-            value={interns}
-            onChange={(e) => setInterns(e.target.value)}
-            className="border border-gray-300 p-2 w-full rounded"
+            name="mentorId"
+            id="mentorId"
+            value={formData.mentorId}
+            onChange={(e) =>
+              setFormData({ ...formData, mentorId: e.target.value })
+            }
+            placeholder="Enter mentor ID"
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            required
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Submit
-        </button>
+
+        <div>
+          <label
+            htmlFor="evaluationPeriod"
+            className="block text-lg font-medium text-gray-800"
+          >
+            Evaluation Period
+          </label>
+          <select
+            name="evaluationPeriod"
+            id="evaluationPeriod"
+            value={formData.evaluationPeriod}
+            onChange={(e) =>
+              setFormData({ ...formData, evaluationPeriod: e.target.value })
+            }
+            className="mt-2 w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            required
+          >
+            <option value={0}>Weekly</option>
+            <option value={1}>Fortnight</option>
+            <option value={2}>Monthly</option>
+          </select>
+        </div>
+
+        {/* Interns */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* Add Intern */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Add Intern
+            </h2>
+            {loading ? (
+              <p className="text-gray-500">Loading interns...</p>
+            ) : error ? (
+              <p className="text-red-600">{error}</p>
+            ) : (
+              <ul className="space-y-4">
+                {interns.map((intern) => (
+                  <li
+                    key={intern.userId}
+                    className="flex justify-between items-center bg-gray-50 px-4 py-2 border rounded-lg shadow-sm"
+                  >
+                    <div className="grid grid-cols-3 gap-4 border-gray-300">
+                      <div className="px-4 py-2 text-gray-700 font-semibold">
+                        ID: {intern.userId}
+                      </div>
+                      <div className="px-4 py-2 text-gray-700">
+                        Name: {intern.fullName}
+                      </div>
+                      <div className="px-4 py-2 text-gray-700">
+                        <span
+                          className={`inline-block w-3.5 h-3.5 rounded-full mr-2 ${(() => {
+                            switch (intern.status) {
+                              case "ACTIVE":
+                                return "bg-green-500";
+                              case "INACTIVE":
+                                return "bg-red-500";
+                              case "WARNING":
+                                return "bg-yellow-500";
+                              case "DISQUALIFIED":
+                                return "bg-gray-500";
+                              default:
+                                return "bg-gray-500";
+                            }
+                          })()}`}
+                        ></span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAddIntern(intern.userId)}
+                      className="px-3 py-1 bg-gray-700 text-white hover:font-bold  rounded-lg shadow-sm hover:scale-105 transform transition duration-30 hover:bg-white hover:text-gray-600 border border-gray-600"
+                    >
+                      Add
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Display Added Interns */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Added Interns
+            </h2>
+            {formData.interns.length > 0 ? (
+              <ul className="space-y-4">
+                {formData.interns.map((userId, index) => (
+                  <li
+                    key={index}
+                    className="flex justify-between items-center bg-gray-50 px-4 py-2 border rounded-lg shadow-sm"
+                  >
+                    <th className="text-gray-700">
+                      <td className="text-gray-700">{userId}</td>
+                      {/* <td className="text-gray-700 ">
+                        {interns.find((i) => i.userId === userId)?.fullName}
+                      </td> */}
+                    </th>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveIntern(userId)}
+                      className="text-red-600 hover:font-bold hover:scale-105 transform transition duration-30"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No interns added yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div className="text-right">
+          <button
+            type="submit"
+            className={`px-6 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </div>
       </form>
+
+      {/* Messages */}
+      {successMessage && (
+        <div className="mt-12 fixed top-4 right-4 p-4 bg-green-100 text-green-800 border border-green-500 rounded-lg shadow-lg">
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className="fixed top-4 right-4 p-4 bg-red-100 text-red-800 border border-red-500 rounded-lg shadow-lg">
+          {errorMessage}
+        </div>
+      )}
     </div>
   );
 };
 
-export default CreateAuditForm;
-// import React, { useState } from "react";
-// import { Modal, Button, Form } from "react-bootstrap";
-
-// const AuditForm = ({ onSubmit, onClose }) => {
-//   const [mentorId, setMentorId] = useState("");
-//   const [evaluationPeriod, setEvaluationPeriod] = useState(0);
-//   const [interns, setInterns] = useState("");
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     const formData = {
-//       mentorId,
-//       evaluationPeriod: parseInt(evaluationPeriod),
-//       interns: interns.split(",").map((id) => id.trim()),
-//     };
-//     onSubmit(formData);
-//   };
-
-//   return (
-//     <Modal show onHide={onClose}>
-//       <Modal.Header closeButton>
-//         <Modal.Title>Create New Audit</Modal.Title>
-//       </Modal.Header>
-//       <Modal.Body>
-//         <Form onSubmit={handleSubmit}>
-//           <Form.Group controlId="mentorId" className="mb-3">
-//             <Form.Label>Mentor ID</Form.Label>
-//             <Form.Control
-//               type="text"
-//               value={mentorId}
-//               onChange={(e) => setMentorId(e.target.value)}
-//               required
-//             />
-//           </Form.Group>
-//           <Form.Group controlId="evaluationPeriod" className="mb-3">
-//             <Form.Label>Evaluation Period</Form.Label>
-//             <Form.Select
-//               value={evaluationPeriod}
-//               onChange={(e) => setEvaluationPeriod(e.target.value)}
-//             >
-//               <option value="0">WEEKLY</option>
-//               <option value="1">FORTNIGHT</option>
-//               <option value="2">MONTHLY</option>
-//             </Form.Select>
-//           </Form.Group>
-//           <Form.Group controlId="interns" className="mb-3">
-//             <Form.Label>Intern IDs (comma separated)</Form.Label>
-//             <Form.Control
-//               type="text"
-//               value={interns}
-//               onChange={(e) => setInterns(e.target.value)}
-//               required
-//             />
-//           </Form.Group>
-//           <Button variant="primary" type="submit">
-//             Submit
-//           </Button>
-//         </Form>
-//       </Modal.Body>
-//     </Modal>
-//   );
-// };
-
-// export default AuditForm;
+export default CreateFormAudit;

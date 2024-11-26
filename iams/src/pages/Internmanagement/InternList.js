@@ -314,6 +314,7 @@ const InternList = () => {
             <tr className="text-xl font-bold bg-gray-800 text-white border">
               <th className="px-4 py-2">#</th>
               <th className="px-4 py-2">Account</th>
+              <th className="px-4 py-2">User ID</th>
               <th className="px-4 py-2">Full Name</th>
               <th className="px-4 py-2">Social Number</th>
               <th className="px-4 py-2">Mentor</th>
@@ -329,6 +330,7 @@ const InternList = () => {
                 className="border-t hover:bg-gradient-to-r hover:from-blue-300 hover:to-white hover:scale-105 transition-transform transform duration-300"
               >
                 <td className="px-4 py-2 text-center">{index + 1}</td>
+                <td className="px-4 py-2 text-center">{intern.userId}</td>
                 <td className="px-4 py-2">{intern.account}</td>
                 <td className="px-4 py-2">{intern.fullName}</td>
                 <td className="px-4 py-2">{intern.socialNum}</td>
@@ -338,7 +340,7 @@ const InternList = () => {
                     ? new Date(intern.joinDate).toLocaleDateString("en-GB")
                     : "N/A"}
                 </td>
-                <td className="px-4 py-2 text-center">
+                <td className="px-4 py-2 ">
                   <span
                     className={`inline-block w-3.5 h-3.5 rounded-full mr-2 ${(() => {
                       switch (intern.status) {
