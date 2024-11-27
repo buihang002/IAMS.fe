@@ -97,7 +97,10 @@ import AuditResultDetails from "./pages/Audit/Mentor/AuditResultDetails";
 import Unauthorized from "./pages/Unauthorized/Unauthorized";
 import DashboardMentor from "./pages/Dashboard/DashboardMentor";
 import DashboardIntern from "./pages/Dashboard/DashboardIntern";
-
+import AuditIntern from "./pages/AuditIntern/AuditIntern";
+import AuditInternDetail from "./pages/AuditIntern/AuditInternDetail";
+import AuditIdDetails from "./pages/Audit/Mentor/AuditIDDetails";
+import AuditInternEvaluation from "./pages/Audit/Mentor/AuditInternEvaluation";
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(true); // State quản lý Sidebar
   const location = useLocation();
@@ -164,6 +167,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/auditintern"
+              element={
+                <ProtectedRoute allowedRoles={["INTERN"]}>
+                  <AuditIntern />
+                </ProtectedRoute>
+              }
+            />
             {/* Routes for MENTOR role */}
             <Route
               path="/dashboardmentor"
@@ -194,10 +205,17 @@ function App() {
               element={<CreateInternForm />}
             />
             <Route path="/create-audit" element={<CreateAuditForm />} />
-            <Route path="/audit/:id" element={<AuditDetail />} />
+            {/* <Route path="/audit/:auditId/:id" element={<AuditIdDetails />} /> */}
+            <Route path="/audit/:auditId" element={<AuditIdDetails />} />
             <Route path="/audit/id" element={<AuditListID />} />
             <Route path="/audit-result" element={<AuditResult />} />{" "}
             <Route path="/audit-result/:id" element={<AuditResultDetails />} />
+            <Route path="/audit-detail/:id" element={<AuditInternDetail />} />
+            <Route
+              path="/audit-intern/:id/evaluation"
+              element={<AuditInternEvaluation />}
+            />
+            {/* Detail route */}
           </Routes>
         </div>
       </div>

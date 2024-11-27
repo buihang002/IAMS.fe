@@ -19,11 +19,11 @@ export default function Login() {
 
   const formik = useFormik({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validationSchema: Yup.object({
-      username: Yup.string().required("Please enter your username."),
+      email: Yup.string().required("Please enter your email."),
       password: Yup.string().required("Please enter your password."),
     }),
     onSubmit: async (values) => {
@@ -76,22 +76,22 @@ export default function Login() {
         <form onSubmit={formik.handleSubmit}>
           {/* Username Field */}
           <div className="mb-4">
-            <label className="block text-gray-700 mb-1" htmlFor="username">
-              Username
+            <label className="block text-gray-700 mb-1" htmlFor="email">
+              Email
             </label>
             <div className="flex items-center border rounded p-2">
               <i className="bi bi-person text-gray-500 mr-2"></i>
               <input
-                id="username"
+                id="email"
                 className="flex-1 outline-none"
                 placeholder="Email or login"
                 type="text"
-                {...formik.getFieldProps("username")}
+                {...formik.getFieldProps("email")}
               />
             </div>
-            {formik.touched.username && formik.errors.username ? (
+            {formik.touched.email && formik.errors.email ? (
               <div className="text-red-600 text-sm mt-1">
-                {formik.errors.username}
+                {formik.errors.email}
               </div>
             ) : null}
           </div>

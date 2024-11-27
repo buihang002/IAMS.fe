@@ -313,11 +313,12 @@ const InternList = () => {
           <thead>
             <tr className="text-xl font-bold bg-gray-800 text-white border">
               <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Account</th>
-              <th className="px-4 py-2">User ID</th>
+              {/* <th className="px-4 py-2">User ID</th> */}
+              <th className="px-4 py-2">Email</th>
+
               <th className="px-4 py-2">Full Name</th>
-              <th className="px-4 py-2">Social Number</th>
-              <th className="px-4 py-2">Mentor</th>
+              {/* <th className="px-4 py-2">Social Number</th> */}
+              {/* <th className="px-4 py-2">Mentor</th> */}
               <th className="px-4 py-2">Join Date</th>
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2">Actions</th>
@@ -327,14 +328,14 @@ const InternList = () => {
             {interns.map((intern, index) => (
               <tr
                 key={intern.userId}
-                className="border-t hover:bg-gradient-to-r hover:from-blue-300 hover:to-white hover:scale-105 transition-transform transform duration-300"
+                className="border-t hover:bg-gradient-to-r hover:bg-gray-50 border shadow-sm hover:scale-105 transition-transform transform duration-300"
               >
                 <td className="px-4 py-2 text-center">{index + 1}</td>
-                <td className="px-4 py-2 text-center">{intern.userId}</td>
+                {/* <td className="px-4 py-2 text-center">{intern.userId}</td> */}
                 <td className="px-4 py-2">{intern.account}</td>
                 <td className="px-4 py-2">{intern.fullName}</td>
-                <td className="px-4 py-2">{intern.socialNum}</td>
-                <td className="px-4 py-2 text-center">{intern.mentorId}</td>
+                {/* <td className="px-4 py-2">{intern.socialNum}</td> */}
+                {/* <td className="px-4 py-2 text-center">{intern.mentorId}</td> */}
                 <td className="px-4 py-2 text-center">
                   {intern.joinDate
                     ? new Date(intern.joinDate).toLocaleDateString("en-GB")

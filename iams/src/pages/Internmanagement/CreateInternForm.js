@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/MyAxios";
 
 const CreateInternForm = () => {
@@ -32,7 +32,12 @@ const CreateInternForm = () => {
 
   return (
     <div className="  p-6 bg-white ">
-      <h1 className="text-2xl font-bold mb-6 p-2 bg-gray-200 rounded-md text-gray-900 text-center">
+      <Link to={"/intern"}>
+        <button className="px-4 mb-6  text-gray-600 hover:font-bold hover:text-gray-800">
+          Back to List
+        </button>
+      </Link>
+      <h1 className="text-2xl font-bold mb-6 p-2 rounded-md text-gray-900 text-center">
         NEW INTERN REGISTRATION FORM
       </h1>
       {error && <p className="text-red-500">{error}</p>}

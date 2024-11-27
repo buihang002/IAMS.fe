@@ -3,7 +3,7 @@ import AuditID from "../Audit/Mentor/AuditID";
 import AuditResult from "../Audit/Mentor/AuditResult";
 
 const Audit = () => {
-  const [activeTab, setActiveTab] = useState("id"); // Quản lý tab hiện tại
+  const [activeTab, setActiveTab] = useState("id");
 
   return (
     <div className="p-4">

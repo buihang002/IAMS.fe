@@ -39,6 +39,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
           )}
+          {user?.role === "INTERN" && (
+            <li className="text-lg p-2 font-bold bg-gradient-to-br from-white to-white bg-clip-text text-transparent hover:from-blue-500 hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out hover:scale-110 active:scale-90">
+              <Link to="/auditintern" className="flex items-center">
+                <i className={`bi bi-calendar3 ${isOpen ? "mr-2" : ""}`} />
+                {isOpen && "Audit"}
+              </Link>
+            </li>
+          )}
           {user?.role === "MENTOR" && (
             <li className="text-lg p-2 font-bold bg-gradient-to-br from-white to-white bg-clip-text text-transparent hover:from-blue-500 hover:to-white active:from-indigo-600 active:via-cyan-500 active:to-teal-400 transform transition-transform duration-300 ease-in-out hover:scale-110 active:scale-90">
               <Link to="/dashboardmentor" className="flex items-center">

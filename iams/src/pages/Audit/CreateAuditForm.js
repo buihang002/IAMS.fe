@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../utils/MyAxios";
+import { Link } from "react-router-dom";
 
 const CreateFormAudit = () => {
   const [formData, setFormData] = useState({
@@ -9,10 +10,12 @@ const CreateFormAudit = () => {
   });
 
   const [interns, setInterns] = useState([]);
+  const [filteredInterns, setFilteredInterns] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Add searchQuery state
 
   useEffect(() => {
     const fetchInterns = async () => {
@@ -34,6 +37,7 @@ const CreateFormAudit = () => {
 
         if (response && response.data) {
           setInterns(response.data);
+          setFilteredInterns(response.data); // Initialize with all interns
         } else {
           setError("No interns found for this mentor.");
         }
@@ -50,6 +54,21 @@ const CreateFormAudit = () => {
 
     fetchInterns();
   }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    filterInterns(e.target.value);
+  };
+
+  const filterInterns = (query) => {
+    const lowercasedQuery = query.toLowerCase();
+    const filtered = interns.filter(
+      (intern) =>
+        intern.fullName.toLowerCase().includes(lowercasedQuery) ||
+        intern.userId.toString().includes(lowercasedQuery)
+    );
+    setFilteredInterns(filtered);
+  };
 
   const handleAddIntern = (userId) => {
     if (!formData.interns.includes(userId)) {
@@ -98,6 +117,11 @@ const CreateFormAudit = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white">
+      <Link to={"/audit"}>
+        <button className="px-4 mb-6  text-gray-600 hover:font-bold hover:text-gray-800">
+          Back to List
+        </button>
+      </Link>
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-6">
         Create Audit Form
       </h1>
@@ -154,13 +178,25 @@ const CreateFormAudit = () => {
             <h2 className="text-xl font-semibold text-gray-700 mb-4">
               Add Intern
             </h2>
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search interns by name or ID"
+                className="mt-2 w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4"
+              />
+              <i className="bi bi-search absolute top-4 left-3 text-gray-500"></i>
+            </div>
+
             {loading ? (
               <p className="text-gray-500">Loading interns...</p>
             ) : error ? (
               <p className="text-red-600">{error}</p>
             ) : (
               <ul className="space-y-4">
-                {interns.map((intern) => (
+                {filteredInterns.map((intern) => (
                   <li
                     key={intern.userId}
                     className="flex justify-between items-center bg-gray-50 px-4 py-2 border rounded-lg shadow-sm"
@@ -195,7 +231,7 @@ const CreateFormAudit = () => {
                     <button
                       type="button"
                       onClick={() => handleAddIntern(intern.userId)}
-                      className="px-3 py-1 bg-gray-700 text-white hover:font-bold  rounded-lg shadow-sm hover:scale-105 transform transition duration-30 hover:bg-white hover:text-gray-600 border border-gray-600"
+                      className="px-3 py-1 bg-gray-700 text-white hover:font-bold rounded-lg shadow-sm hover:scale-105 transform transition duration-30 hover:bg-white hover:text-gray-600 border border-gray-600"
                     >
                       Add
                     </button>
@@ -219,9 +255,6 @@ const CreateFormAudit = () => {
                   >
                     <th className="text-gray-700">
                       <td className="text-gray-700">{userId}</td>
-                      {/* <td className="text-gray-700 ">
-                        {interns.find((i) => i.userId === userId)?.fullName}
-                      </td> */}
                     </th>
                     <button
                       type="button"
@@ -243,17 +276,12 @@ const CreateFormAudit = () => {
         <div className="text-right">
           <button
             type="submit"
-            className={`px-6 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
           >
-            {loading ? "Submitting..." : "Submit"}
+            Create
           </button>
         </div>
       </form>
-
-      {/* Messages */}
       {successMessage && (
         <div className="mt-12 fixed top-4 right-4 p-4 bg-green-100 text-green-800 border border-green-500 rounded-lg shadow-lg">
           {successMessage}

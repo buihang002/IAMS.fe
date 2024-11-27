@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const AuditResultDetails = () => {
-  const { id } = useParams(); // Lấy ID từ URL
+  const { id } = useParams();
   const [details, setDetails] = useState(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const AuditResultDetails = () => {
   if (!details) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-11 mr-6 ml-6">
+    <div className="container mx-auto px-4 py-8 mr-6 ml-6">
       <h1 className="text-2xl font-bold mb-6 ">
         Audit Result Details for Intern ID:
         <span className="text-gray-600"> {details.internId}</span>
