@@ -288,7 +288,7 @@ const CreateFormAudit = () => {
         </div>
       )}
       {errorMessage && (
-        <div className="fixed top-4 right-4 p-4 bg-red-100 text-red-800 border border-red-500 rounded-lg shadow-lg">
+        <div className="fixed top-4 right-4 p-4 mt-11 bg-red-100 text-red-800 border border-red-500 rounded-lg shadow-lg">
           {errorMessage}
         </div>
       )}

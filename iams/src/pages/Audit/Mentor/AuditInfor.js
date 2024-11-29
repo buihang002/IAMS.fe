@@ -48,7 +48,7 @@ const AuditInformation = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Audit List</h1>
+      <h1 className="text-2xl font-bold mb-4">Audit List Details</h1>
       <div className="flex items-center justify-end gap-4 mb-6">
         <Link
           to="/create-audit"
@@ -116,7 +116,7 @@ const AuditInformation = () => {
                         `/audit-form/audit-intern-form/${audit.auditInternId}`
                       )
                     }
-                    className="px-3 py-1 text-gray-600 text-sm rounded-lg hover:bg-gray-200 hover:shadow"
+                    className="text-gray-600 hover:shadow-md hover:bg-slate-500 hover:text-white px-2 py-1 rounded-md"
                   >
                     View
                   </button>

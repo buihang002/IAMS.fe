@@ -6,17 +6,32 @@ const AuditList = () => {
   const [audits, setAudits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    month: "",
-    year: new Date().getFullYear(),
-  });
+  const [filters, setFilters] = useState({ month: "", year: "" });
   const navigate = useNavigate();
 
+  const currentYear = new Date().getFullYear();
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Fetch audits on component mount
   useEffect(() => {
-    fetchAudits();
+    fetchAuditsByMentor();
   }, []);
 
-  const fetchAudits = async (month = "", year = "") => {
+  // Fetch audits by mentor ID
+  const fetchAuditsByMentor = async () => {
     setLoading(true);
     setError(null);
 
@@ -28,26 +43,43 @@ const AuditList = () => {
       const mentorId = user?.userId;
       if (!mentorId) throw new Error("No mentor ID found in localStorage.");
 
-      const endpoint =
-        month && year
-          ? `/audit/get-by-month?month=${month}&year=${year}`
-          : `/audit/get-by-mentor/${mentorId}`;
-
+      const endpoint = `/audit/get-by-mentor/${mentorId}`;
       const response = await axios.get(endpoint);
 
-      if (response?.data) {
-        setAudits(response.data);
-      } else {
-        setError("No audits found for this mentor.");
-      }
+      setAudits(response?.data?.length > 0 ? response.data : []);
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.response?.data?.message || "Failed to fetch audits.");
+      console.error("Error fetching audits by mentor:", err);
+      setError(
+        err.response?.data?.message || "Failed to fetch audits by mentor."
+      );
+      setAudits([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch audits by month and year
+  const fetchAuditsByDate = async (month, year) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const endpoint = `/audit/get-by-month?month=${month}&year=${year}`;
+      const response = await axios.get(endpoint);
+
+      setAudits(response?.data?.length > 0 ? response.data : []);
+    } catch (err) {
+      console.error("Error fetching audits by date:", err);
+      setError(
+        err.response?.data?.message || "Failed to fetch audits by date."
+      );
+      setAudits([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle filter input changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
@@ -56,11 +88,18 @@ const AuditList = () => {
     }));
   };
 
-  const applyFilters = () => {
+  // Apply filters by month and year
+  const filterByDate = () => {
     const { month, year } = filters;
-    fetchAudits(month, year);
+
+    if (!month || !year) {
+      setError("Please select both month and year.");
+      return;
+    }
+    fetchAuditsByDate(month, year);
   };
 
+  // Navigate to audit details
   const handleViewDetails = (auditId) => {
     navigate(`/audit/${auditId}`);
   };
@@ -68,52 +107,45 @@ const AuditList = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Audit List</h1>
+
+      {/* Filter Section */}
       <div className="flex items-center justify-end gap-4 mb-6">
-        {/* Chọn tháng */}
         <div className="flex items-center gap-2">
-          <label htmlFor="month-select" className="text-gray-700 font-medium">
-            Month:
-          </label>
           <select
-            id="month-select"
             name="month"
-            className="border border-gray-300 rounded-md px-3 py-2"
+            className="border border-gray-300 rounded-lg p-2 text-sm w-32"
             value={filters.month}
             onChange={handleFilterChange}
           >
-            <option value="">All Months</option>
-            {[...Array(12).keys()].map((month) => (
-              <option key={month + 1} value={month + 1}>
-                {new Date(0, month).toLocaleString("default", {
-                  month: "long",
-                })}
+            <option value="">Select Month</option>
+            {months.map((month, index) => (
+              <option key={index} value={index + 1}>
+                {month}
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Chọn năm */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="year-select" className="text-gray-700 font-medium">
-            Year:
-          </label>
-          <input
-            id="year-select"
-            type="number"
+          <select
             name="year"
-            className="border border-gray-300 rounded-md px-3 py-2 w-24"
+            className="border border-gray-300 rounded-lg p-2 text-sm w-32"
             value={filters.year}
             onChange={handleFilterChange}
-            min="2000"
-            max="2100"
-          />
+          >
+            <option value="">Select Year</option>
+            {Array.from({ length: 5 }, (_, i) => currentYear - i).map(
+              (year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              )
+            )}
+          </select>
+          <button
+            onClick={filterByDate}
+            className="text-white text-sm px-3 py-1 rounded-lg bg-gray-800 hover:bg-gray-700"
+          >
+            Search
+          </button>
         </div>
-        <button
-          className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900"
-          onClick={applyFilters}
-        >
-          Search
-        </button>
         <button className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900">
           <Link to="/create-audit">
             <i className="bi bi-plus-circle-fill mr-2"></i>Create Audit
@@ -121,6 +153,7 @@ const AuditList = () => {
         </button>
       </div>
 
+      {/* Audit Table */}
       {loading ? (
         <p>Loading audits...</p>
       ) : error ? (
@@ -161,7 +194,7 @@ const AuditList = () => {
                 <td className="px-4 py-2">
                   <button
                     onClick={() => handleViewDetails(audit.auditId)}
-                    className="px-3 py-1 text-gray-600 text-sm rounded-lg hover:bg-gray-200 hover:shadow"
+                    className="text-gray-600 hover:shadow-md hover:bg-slate-500 hover:text-white px-2 py-1 rounded-md"
                   >
                     View
                   </button>

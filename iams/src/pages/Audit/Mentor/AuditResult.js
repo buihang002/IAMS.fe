@@ -161,47 +161,52 @@ const AuditResultList = () => {
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-gray-800 text-white">
-              <th className="px-4 py-2">Result ID</th>
-              <th className="px-4 py-2">Intern ID</th>
-              <th className="px-4 py-2">Mentor ID</th>
-              <th className="px-4 py-2">Average Result</th>
-              <th className="px-4 py-2">Create Time</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {auditResults.map((result) => (
-              <tr
-                key={result.resultId}
-                className="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-200"
-              >
-                <td className="px-4 py-2">{result.resultId}</td>
-                <td className="px-4 py-2">{result.internId}</td>
-                <td className="px-4 py-2">{result.mentorId}</td>
-                <td className="px-4 py-2">{result.aveResult.toFixed(2)}</td>
-                <td className="px-4 py-2">
-                  {new Date(result.createTime).toLocaleString()}
-                </td>
-                <td className="px-4 py-2 text-center">
-                  <button
-                    onClick={() => handleViewDetails(result.resultId)}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    View
-                  </button>
-                </td>
+      <div className="overflow-x-auto border border-gray-200 rounded-lg text-gray-500 hover:text-gray-800">
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Result ID</th>
+                <th className="px-4 py-2">Intern ID</th>
+                <th className="px-4 py-2">Mentor ID</th>
+                <th className="px-4 py-2">Average Result</th>
+                <th className="px-4 py-2">Create Time</th>
+                <th className="px-4 py-2">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {auditResults.map((result) => (
+                <tr
+                  key={result.resultId}
+                  className=" border-t border-gray-200 shadow-sm even:bg-gray-50 hover:bg-gray-200"
+                >
+                  <td className="px-4 py-2">
+                    {auditResults.indexOf(result) + 1}
+                  </td>
+                  <td className="px-4 py-2">{result.resultId}</td>
+                  <td className="px-4 py-2">{result.internId}</td>
+                  <td className="px-4 py-2">{result.mentorId}</td>
+                  <td className="px-4 py-2">{result.aveResult.toFixed(2)}</td>
+                  <td className="px-4 py-2">
+                    {new Date(result.createTime).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <button
+                      onClick={() => handleViewDetails(result.resultId)}
+                      className="text-gray-600 hover:shadow-md hover:bg-slate-500 hover:text-white px-2 py-1 rounded-md"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
