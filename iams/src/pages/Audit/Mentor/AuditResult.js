@@ -4,142 +4,167 @@ import { useNavigate } from "react-router-dom";
 
 const AuditResultList = () => {
   const [auditResults, setAuditResults] = useState([]);
-  const [internId, setInternId] = useState("");
-  const [mentorId, setMentorId] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
+  const [filters, setFilters] = useState({
+    internId: "",
+    month: "",
+    year: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [mentorId, setMentorId] = useState(null);
+
+  const currentYear = new Date().getFullYear();
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/audit-result/find-all")
-      .then((response) => setAuditResults(response.data))
-      .catch((error) => console.error("Error fetching audit results:", error));
+    const userStr = localStorage.getItem("user");
+    if (!userStr) {
+      setError("User not logged in.");
+      return;
+    }
+    const user = JSON.parse(userStr);
+    if (!user?.userId) {
+      setError("No mentor ID found in localStorage.");
+      return;
+    }
+    setMentorId(user.userId);
+    fetchAuditResults(user.userId);
   }, []);
 
-  const filterByInternId = () => {
-    if (!internId) return;
+  const fetchAuditResults = async (mentorId) => {
+    setLoading(true);
+    setError(null);
 
-    axios
-      .get(
-        `http://localhost:8080/audit-result/intern/find-by-intern/${internId}`
-      )
-      .then((response) => setAuditResults(response.data))
-      .catch((error) => console.error("Error filtering by intern ID:", error));
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/audit-result/mentor/${mentorId}`
+      );
+      setAuditResults(response.data || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError(err.response?.data?.message || "Failed to fetch audits.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filterByMentorId = () => {
-    if (!mentorId) return;
-
-    axios
-      .get(`http://localhost:8080/audit-result/mentor/${mentorId}`)
-      .then((response) => setAuditResults(response.data))
-      .catch((error) => console.error("Error filtering by mentor ID:", error));
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const filterByDate = () => {
-    if (!month || !year) return;
-
-    axios
-      .get(
+  const filterByDate = async () => {
+    const { month, year } = filters;
+    if (!mentorId) {
+      setError("No mentor ID available.");
+      return;
+    }
+    if (!month || !year) {
+      setError("Please select both month and year.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(
         `http://localhost:8080/audit-result/mentor/${mentorId}/get-by-date?month=${month}&year=${year}`
-      )
-      .then((response) => setAuditResults(response.data))
-      .catch((error) => console.error("Error filtering by date:", error));
+      );
+      setAuditResults(response.data || []);
+    } catch (err) {
+      console.error("Error filtering by date:", err);
+      setError(err.response?.data?.message || "Failed to filter by Date.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleViewDetails = (resultId) => {
-    navigate(`/audit-result/${resultId}`);
+    navigate(`/audit-result/intern/${resultId}`);
   };
 
   return (
-    <div className="container mx-auto p-4  ">
-      <h1 className="text-2xl font-bold mb-4">Audit Result</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Audit Result List</h1>
 
-      <div className="flex flex-wrap justify-end gap-2 mb-6">
-        {/* Filter by Intern ID */}
-        <div className="">
+      <div className="flex flex-wrap gap-4 mb-6 justify-end">
+        <div>
           <input
             type="text"
+            name="internId"
             placeholder="Intern ID"
             className="border border-gray-300 rounded-lg p-2 text-sm w-52"
-            value={internId}
-            onChange={(e) => setInternId(e.target.value)}
+            value={filters.internId}
+            onChange={handleFilterChange}
           />
           <button
-            onClick={filterByInternId}
-            className="hover:bg-white ml-2 hover:border-2 hover:border-gray-500 hover:text-gray-800 hover:shadow-sm text-white text-sm px-3 py-1 rounded-lg bg-gray-800"
+            onClick={() => fetchAuditResults(mentorId)}
+            className="ml-2 text-white text-sm px-3 py-1 rounded-lg bg-gray-800 hover:bg-gray-700"
           >
-            <i className="bi bi-search" />
+            Search
           </button>
         </div>
 
-        {/* Filter by Date */}
-        <div className="ml-4">
-          <input
-            type="number"
-            placeholder="Month"
-            className="border border-gray-300 rounded-lg p-2 text-sm w-52"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Year"
-            className="border border-gray-300 rounded-lg p-2 text-sm w-52"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          />
+        <div className="flex items-center gap-2">
+          <select
+            name="month"
+            className="border border-gray-300 rounded-lg p-2 text-sm w-32"
+            value={filters.month}
+            onChange={handleFilterChange}
+          >
+            <option value="">Select Month</option>
+            {months.map((month, index) => (
+              <option key={index} value={index + 1}>
+                {month}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="year"
+            className="border border-gray-300 rounded-lg p-2 text-sm w-32"
+            value={filters.year}
+            onChange={handleFilterChange}
+          >
+            <option value="">Select Year</option>
+            {Array.from({ length: 5 }, (_, i) => currentYear - i).map(
+              (year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              )
+            )}
+          </select>
+
           <button
             onClick={filterByDate}
-            className="hover:bg-white ml-2 hover:border-2 hover:border-gray-500 hover:text-gray-800 hover:shadow-sm text-white text-sm px-3 py-1 rounded-lg bg-gray-800"
+            className="text-white text-sm px-3 py-1 rounded-lg bg-gray-800 hover:bg-gray-700"
           >
-            <i className="bi bi-search" />
+            Search
           </button>
         </div>
-
-        {/* Filter by Mentor ID */}
-        {/* <div className="flex gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Search by Mentor ID"
-            className="border border-gray-300 rounded-lg p-2 flex-grow"
-            value={mentorId}
-            onChange={(e) => setMentorId(e.target.value)}
-          />
-          <button
-            onClick={filterByMentorId}
-            className="hover:bg-white hover:border-2 hover:border-gray-500 hover:text-gray-800 hover:shadow-sm  text-white px-4 py-2 rounded-lg bg-gray-800"
-          >
-            <i className="bi bi-search" />
-          </button>
-        </div> */}
-
-        {/* Filter by Date */}
-        {/* <div className="flex gap-2 mb-6">
-          <input
-            type="number"
-            placeholder="Month"
-            className="border border-gray-300 rounded-lg p-2"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Year"
-            className="border border-gray-300 rounded-lg p-2"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          />
-          <button
-            onClick={filterByDate}
-            className="hover:bg-white hover:border-2 hover:border-gray-500 hover:text-gray-800 hover:shadow-sm  text-white px-4 py-2 rounded-lg bg-gray-800"
-          >
-            <i className="bi bi-search" />
-          </button>
-        </div> */}
       </div>
-      <div className="overflow-x-auto">
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-gray-800 text-white">
@@ -147,7 +172,6 @@ const AuditResultList = () => {
               <th className="px-4 py-2">Intern ID</th>
               <th className="px-4 py-2">Mentor ID</th>
               <th className="px-4 py-2">Average Result</th>
-              <th className="px-4 py-2">Qualified</th>
               <th className="px-4 py-2">Create Time</th>
               <th className="px-4 py-2">Actions</th>
             </tr>
@@ -156,29 +180,28 @@ const AuditResultList = () => {
             {auditResults.map((result) => (
               <tr
                 key={result.resultId}
-                className="odd:bg-gray-100 even:bg-gray-50 border-t hover:bg-gradient-to-r hover:bg-gray-50 border shadow-sm hover:scale-105 transition-transform transform duration-300"
+                className="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-200"
               >
                 <td className="px-4 py-2">{result.resultId}</td>
                 <td className="px-4 py-2">{result.internId}</td>
                 <td className="px-4 py-2">{result.mentorId}</td>
                 <td className="px-4 py-2">{result.aveResult.toFixed(2)}</td>
-                <td className="px-4 py-2">{result.isQualify ? "Yes" : "No"}</td>
                 <td className="px-4 py-2">
                   {new Date(result.createTime).toLocaleString()}
                 </td>
                 <td className="px-4 py-2 text-center">
                   <button
                     onClick={() => handleViewDetails(result.resultId)}
-                    className="px-3 py-1 text-gray-600 text-sm rounded-lg hover:bg-gray-200 hover:shadow"
+                    className="text-gray-600 hover:text-gray-800"
                   >
-                    <i className="bi bi-eye-fill" />
+                    View
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      )}
     </div>
   );
 };

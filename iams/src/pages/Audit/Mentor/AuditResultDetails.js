@@ -66,15 +66,7 @@ const AuditResultDetails = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <div>
-            <label className="block font-semibold mb-2">Qualified</label>
-            <input
-              type="text"
-              value={details.isQualify ? "Yes" : "No"}
-              readOnly
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
+
           <div>
             <label className="block font-semibold mb-2">Create Time</label>
             <input

@@ -184,7 +184,7 @@ const InternList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <h1 className="text-3xl font-bold "> Intern Management</h1>
+      <h1 className="text-3xl font-bold uppercase"> Intern Management</h1>
       <p className="text-gray-500 text-sm">
         Manage intern roster and progress details
       </p>

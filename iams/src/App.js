@@ -101,6 +101,7 @@ import AuditIntern from "./pages/AuditIntern/AuditIntern";
 import AuditInternDetail from "./pages/AuditIntern/AuditInternDetail";
 import AuditIdDetails from "./pages/Audit/Mentor/AuditIDDetails";
 import AuditInternEvaluation from "./pages/Audit/Mentor/AuditInternEvaluation";
+import AuditFormDetails from "./pages/Audit/Mentor/AuditFormDetails";
 function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(true); // State quản lý Sidebar
   const location = useLocation();
@@ -208,12 +209,18 @@ function App() {
             {/* <Route path="/audit/:auditId/:id" element={<AuditIdDetails />} /> */}
             <Route path="/audit/:auditId" element={<AuditIdDetails />} />
             <Route path="/audit/id" element={<AuditListID />} />
-            <Route path="/audit-result" element={<AuditResult />} />{" "}
-            <Route path="/audit-result/:id" element={<AuditResultDetails />} />
+            <Route
+              path="/audit-result/intern/:id"
+              element={<AuditResultDetails />}
+            />
             <Route path="/audit-detail/:id" element={<AuditInternDetail />} />
             <Route
               path="/audit-intern/:id/evaluation"
               element={<AuditInternEvaluation />}
+            />
+            <Route
+              path="/audit-form/audit-intern-form/:id"
+              element={<AuditFormDetails />}
             />
             {/* Detail route */}
           </Routes>
