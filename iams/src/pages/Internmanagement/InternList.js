@@ -216,7 +216,7 @@ const InternList = () => {
         </div> */}
       </div>
       <div className=" flex justify-end items-center mb-6 mt-7">
-        <input
+        {/* <input
           type="text"
           placeholder="Search by name"
           value={searchKeyword}
@@ -229,7 +229,7 @@ const InternList = () => {
         >
           <i className="bi bi-search-heart mr-2" />
           Search
-        </button>
+        </button> */}
         {/* ----------------------- */}
         <div className="relative inline-block text-left ml-2">
           {/* Dropdown button */}
