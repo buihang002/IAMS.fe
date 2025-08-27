@@ -1,3 +1,3 @@
-You can see the detailed project at nhanh master! 
+You can see the detailed project at branch master! 
 Thank you <3
 
